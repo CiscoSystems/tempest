@@ -202,6 +202,7 @@ class FWaaSExtensionTestJSON(base.BaseNetworkTest):
         router = self.create_router(
             data_utils.rand_name('router-'),
             admin_state_up=True)
+	time.sleep(30)
 	response = self.client.add_router_interface_with_subnet_id(
             router['id'], subnet['id'])
 	port_id = response['port_id']
