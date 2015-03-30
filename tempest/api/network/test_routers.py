@@ -13,6 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import time
 import netaddr
 from tempest_lib.common.utils import data_utils
 
@@ -151,6 +152,7 @@ class RoutersTest(base.BaseRouterTest):
         subnet = self.create_subnet(network)
         router = self._create_router(data_utils.rand_name('router-'))
         # Add router interface with subnet id
+        time.sleep(30)
         interface = self.client.add_router_interface_with_subnet_id(
             router['id'], subnet['id'])
         self.addCleanup(self._remove_router_interface_with_subnet_id,

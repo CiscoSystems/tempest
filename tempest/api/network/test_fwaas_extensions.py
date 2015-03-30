@@ -202,17 +202,17 @@ class FWaaSExtensionTestJSON(base.BaseNetworkTest):
         router = self.create_router(
             data_utils.rand_name('router-'),
             admin_state_up=True)
-	time.sleep(30)
-	response = self.client.add_router_interface_with_subnet_id(
+        time.sleep(30)
+        response = self.client.add_router_interface_with_subnet_id(
             router['id'], subnet['id'])
-	port_id = response['port_id']
+        port_id = response['port_id']
 
-	time.sleep(60 * 6)
+        time.sleep(60 * 6)
         # Create firewall
         body = self.client.create_firewall(
             name=data_utils.rand_name("firewall"),
             firewall_policy_id=self.fw_policy['id'],
-	    port_id=port_id,
+            port_id=port_id,
             direction='both')
         created_firewall = body['firewall']
         firewall_id = created_firewall['id']
