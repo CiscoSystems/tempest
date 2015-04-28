@@ -15,10 +15,11 @@
 import collections
 import netaddr
 import random
-from tempest.common.utils import data_utils
+
+from oslo_log import log as logging
+from tempest_lib.common.utils import data_utils
+from tempest_lib import exceptions as exc
 from tempest import config
-from tempest import exceptions as exc
-from tempest.openstack.common import log as logging
 from tempest.scenario import manager
 from tempest.services.network import resources as net_resources
 from tempest import test
