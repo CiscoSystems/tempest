@@ -84,7 +84,7 @@ class TestNetworkFwaasOps(manager.NetworkScenarioTest):
         security_group = self._create_security_group()
         self.network, self.subnet, self.router = self.create_networks()
         # wait for csr1kv
-        #time.sleep(60 * 6)
+        time.sleep(60 * 6)
         public_network_id = CONF.network.public_network_id
         create_kwargs = {
             'networks': [
