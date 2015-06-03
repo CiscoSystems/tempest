@@ -570,3 +570,20 @@ class ServersClientJSON(service_client.ServiceClient):
         body = json.loads(body)
         self.validate_response(schema.create_get_server_group, resp, body)
         return service_client.ResponseBody(resp, body['server_group'])
+
+    def create_security_group(self, name, description, tenant_id):
+        post_body = {
+            'name': name,
+            'description': description,
+        }
+
+        post_body = json.dumps({'security_group': post_body})
+        resp, body = self.post('os-security-groups', post_body)
+
+        body = json.loads(body)
+        return service_client.ResponseBody(resp, body['security_group'])
+
+    def delete_security_group(self, security_group_id):
+        resp, body = self.delete("os-security-groups/%s" %
+                                 str(security_group_id))
+        return service_client.ResponseBody(resp, body)

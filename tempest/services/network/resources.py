@@ -89,8 +89,8 @@ class DeletableSubnet(DeletableResource):
 
     def add_to_router(self, router_id):
         self._router_ids.add(router_id)
-        self.client.add_router_interface_with_subnet_id(router_id,
-                                                        subnet_id=self.id)
+        return self.client.add_router_interface_with_subnet_id(router_id,
+                                                               subnet_id=self.id)
 
     def delete(self):
         for router_id in self._router_ids.copy():

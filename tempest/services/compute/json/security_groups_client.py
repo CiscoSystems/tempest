@@ -44,7 +44,7 @@ class SecurityGroupsClientJSON(service_client.ServiceClient):
         self.validate_response(schema.get_security_group, resp, body)
         return service_client.ResponseBody(resp, body['security_group'])
 
-    def create_security_group(self, name, description):
+    def create_security_group(self, name, description, **kwargs):
         """
         Creates a new security group.
         name (Required): Name of security group.
@@ -87,8 +87,8 @@ class SecurityGroupsClientJSON(service_client.ServiceClient):
         self.validate_response(schema.delete_security_group, resp, body)
         return service_client.ResponseBody(resp, body)
 
-    def create_security_group_rule(self, parent_group_id, ip_proto, from_port,
-                                   to_port, **kwargs):
+    def create_security_group_rule(self, security_group_id, protocol, port_range_min=-1,
+                                   port_range_max=-1, **kwargs):
         """
         Creating a new security group rules.
         parent_group_id :ID of Security group
@@ -100,12 +100,12 @@ class SecurityGroupsClientJSON(service_client.ServiceClient):
         group_id : ID of the Source group
         """
         post_body = {
-            'parent_group_id': parent_group_id,
-            'ip_protocol': ip_proto,
-            'from_port': from_port,
-            'to_port': to_port,
-            'cidr': kwargs.get('cidr'),
-            'group_id': kwargs.get('group_id'),
+            'parent_group_id': security_group_id,
+            'ip_protocol': protocol,
+            'from_port': port_range_min,
+            'to_port': port_range_max,
+            'cidr': kwargs.get('remote_ip_prefix', '0.0.0.0/0'),
+            'group_id': kwargs.get('group_id', None),
         }
         post_body = json.dumps({'security_group_rule': post_body})
         url = 'os-security-group-rules'

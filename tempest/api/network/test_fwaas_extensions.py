@@ -86,6 +86,8 @@ class FWaaSExtensionTestJSON(base.BaseNetworkTest):
         # if firewall is not found, this means it was deleted in the test
         except lib_exc.NotFound:
             pass
+        except lib_exc.Conflict:
+            pass
 
         self.client.wait_for_resource_deletion('firewall', fw_id)
 
