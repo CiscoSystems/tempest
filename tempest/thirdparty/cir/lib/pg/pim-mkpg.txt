@@ -1,0 +1,141 @@
+#
+# May 11 2011, Christian E. Hopps
+#
+# Copyright (c) 2013 by cisco Systems, Inc.
+# All rights reserved.
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: NXOS
+
+SHOWCMD: show ip pim group-range
+PREFIX: pim4-group
+ACTUAL:
+
+PIM Group-Range Configuration for VRF "default"
+Group-range        Action    Mode      RP-address       Shared-tree-only range
+232.0.0.0/8        Accept    SSM       -                -
+238.0.0.0/24       ASM       -         192.168.0.1      -
+239.0.0.0/24       ASM       -         192.168.0.1      -
+
+MARKUP:
+PIM Group-Range Configuration for VRF "XQ<vrf>Xdefault"
+Group-range        Action    Mode      RP-address       Shared-tree-only range
+XP<group>X232.0.0.0/8 +XS<action>XAccept +XS<mode>XSSM +XS<rp>X- +XR<strange>X-
+
+SHOWCMD: show ipv6 pim group-range
+PREFIX: pim6-group
+ACTUAL:
+
+PIM6 Group-Range Configuration for VRF "default"
+Group-range               Mode      RP-address          Shared-tree-only range
+ff3x::/32                 SSM       -                   -
+
+MARKUP:
+
+PIM6 Group-Range Configuration for VRF "XQ<vrf>Xdefault"
+Group-range               Mode      RP-address          Shared-tree-only range
+XP<group>Xff44::/120 +XS<mode>XASM +XS<rp>X192::3 +XR<strange>X 
+
+SHOWCMD: show ip pim interface
+PREFIX: pim-intf
+
+ACTUAL:
+
+# For IPv6 the address format chagnes and PIM is PIM6
+
+Ethernet2/2, Interface status: protocol-up/link-up/admin-up
+  IP address: 13.13.13.1, IP subnet: 13.13.13.0/24
+  PIM DR: 13.13.13.1, DR's priority: 1
+  PIM neighbor count: 0
+  PIM hello interval: 30 secs, next hello sent in: 00:00:09
+  PIM neighbor holdtime: 105 secs
+  PIM configured DR priority: 1
+  PIM border interface: no
+  PIM GenID sent in Hellos: 0x1bb71fa2
+  PIM Hello MD5-AH Authentication: disabled
+  PIM Neighbor policy: none configured
+  PIM Join-Prune inbound policy: none configured
+  PIM Join-Prune outbound policy: none configured
+  PIM Join-Prune interval: 1 minutes
+  PIM Join-Prune next sending: 1 minutes
+  PIM BFD enabled: no
+  PIM passive interface: no
+  PIM VPC SVI: no
+  PIM Interface Statistics, last reset: never
+    General (sent/received):
+      Hellos: 6031/0 (early: 0), JPs: 0/0, Asserts: 0/0
+      Grafts: 0/0, Graft-Acks: 0/0
+      DF-Offers: 0/0, DF-Winners: 0/0, DF-Backoffs: 0/0, DF-Passes: 0/0
+    Errors:
+      Checksum errors: 0, Invalid packet types/DF subtypes: 0/0
+      Authentication failed: 0
+      Packet length errors: 0, Bad version packets: 0, Packets from self: 0
+      Packets from non-neighbors: 0
+          Packets received on passiveinterface: 0
+      JPs received on RPF-interface: 0
+      (*,G) Joins received with no/wrong RP: 0/0
+      (*,G)/(S,G) JPs received for SSM/Bidir groups: 0/0
+      JPs filtered by inbound policy: 0
+      JPs filtered by outbound policy: 0o
+
+MARKUP:
+
+XIXEthernet2/2, Interface status: XXX<[^/]+><proto_status>XXXprotocol-up/XXX<[^/]+><link_status>XXXlink-up/XR<config_status>Xadmin-up
+  IP address: 13.13.13.1, IP subnet: 13.13.13.0/24
+  PIM DR: XA<dr_addr>X13.13.13.1, DR's priority: XN<dr_pri>X1
+  PIM neighbor count: XN<nbr_count>X0
+  PIM hello interval: XN<hello_int>X30 secs, next hello sent in: XT<next_hello>X00:00:09
+  PIM neighbor holdtime: XN<nbr_hold>X105 secs
+  PIM configured DR priority: XN<config_dr_pri>X1
+  PIM border interface: XWXno
+  PIM GenID sent in Hellos: 0x1bb71fa2
+  PIM Hello MD5-AH Authentication: XWXdisabled
+  PIM Neighbor policy: XRXnone configured
+  PIM Join-Prune inbound policy: XRXnone configured
+  PIM Join-Prune outbound policy: XRXnone configured
+  PIM Join-Prune interval: XRX1 minutes
+  PIM Join-Prune next sending: XRX1 minutes
+  PIM BFD enabled: XRXno
+  PIM passive interface: XRXno
+  PIM VPC SVI: XRXno
+  PIM Interface Statistics, last reset: never
+    General (sent/received):
+      Hellos: 6031/0 (early: 0), JPs: 0/0, Asserts: 0/0
+      Grafts: 0/0, Graft-Acks: 0/0
+      DF-Offers: 0/0, DF-Winners: 0/0, DF-Backoffs: 0/0, DF-Passes: 0/0
+    Errors:
+      Checksum errors: 0, Invalid packet types/DF subtypes: 0/0
+      Authentication failed: 0
+      Packet length errors: 0, Bad version packets: 0, Packets from self: 0
+      Packets from non-neighbors: 0
+          Packets received on passiveinterface: 0
+      JPs received on RPF-interface: 0
+      (*,G) Joins received with no/wrong RP: 0/0
+      (*,G)/(S,G) JPs received for SSM/Bidir groups: 0/0
+      JPs filtered by inbound policy: 0
+      JPs filtered by outbound policy: 0o
+

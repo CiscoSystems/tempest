@@ -1,0 +1,69 @@
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# April 2015,     R.A. Winters <riwinter@cisco.com>
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: IOS
+
+CMD: SHOW_NETCONF_COUNTERS
+SHOWCMD: show netconf counters
+PREFIX: netconf-counters
+
+ACTUAL:
+
+#show netconf counters
+NETCONF Counters
+Connection Attempts:0: rejected:0 no-hello:0 success:0
+Transactions
+	total:671, success:659, errors:12
+detailed errors:
+	in-use 0 	invalid-value 0 	too-big 0
+	missing-attribute 0 	bad-attribute 0 	unknown-attribute 0
+	missing-element 0 	bad-element 0 	unknown-element 0
+	unknown-namespace 0 	access-denied 0 	lock-denied 0
+	resource-denied 0 	rollback-failed 0 	data-exists 0
+	data-missing 0 	operation-not-supported 0 	operation-failed 12
+	partial-operation 0
+
+
+MARKUP:
+
+#show netconf counters
+NETCONF Counters
+Connection Attempts:XN<attempts>X0: rejected:XN<rejected>X0 no-hello:XN<no-hello>X0 success:XN<success>X0
+XXX<Transactions><transactions>XXXTransactions
+	total:XN<transactions-total>X671, success:XN<transaction-success>X659, errors:XN<transaction-errors>X12
+detailed errors:
+	in-use XN<in-use>X0 	invalid-value XN<invalid-value>X0 	too-big XN<too-big>X0
+	missing-attribute XN<missing-attr>X0 	bad-attribute XN<bad-attr>X0 	unknown-attribute XN<unknow-attr>X0
+	missing-element XN<missing-element>X0 	bad-element XN<bad-element>X0 	unknown-element XN<unknown-element>X0
+	unknown-namespace XN<unknown-namespace>X0 	access-denied XN<access-denied>X0 	lock-denied XN<lock-denied>X0
+	resource-denied XN<resource-denied>X0 	rollback-failed XN<rollback-failed>X0 	data-exists XN<data-exists>X0
+	data-missing XN<data-missing>X0 	operation-not-supported XN<op-not-supported>X0 	operation-failed XN<op-failed>X12
+	partial-operation XN<partial-op>X0
+

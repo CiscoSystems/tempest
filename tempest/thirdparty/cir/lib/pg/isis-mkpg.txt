@@ -1,0 +1,164 @@
+#
+# Jul 21 2013, Siddhesh M. Divekar
+#
+# Copyright (c) 2013 by cisco Systems, Inc.
+# All rights reserved.
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+
+OS: IOX
+
+SHOWCMD: show isis prefix
+PREFIX: isis-prefix
+
+ACTUAL:
+
+L1 3.3.3.3/32 [20/115] medium priority
+     via 24.1.0.4, GigabitEthernet0/0/0/2, r4, sid-value [16000]
+     src r3.00-00, 3.3.3.3, nodal-sid-offset 5, R:0 N:0 P:1
+
+MARKUP:
+
+L1 XP<prefix>X3.3.3.3/32 [20/115] medium priority
+     via XA<firsthopaddress>X24.1.0.4, XI<firsthopinterface>XGigabitEthernet0/0/0/2, XW<firsthopname>Xr4, sid-value [XN<sidvalue>X16000]
+     src XW<routername>Xr3.00-00, XA<routeraddress>X3.3.3.3, nodal-sid-offset XN<prefixindex>X5, R:XN<rflag>X0 N:XN<nflag>X0 P:XN<pflag>X1
+
+
+OS: IOX
+
+SHOWCMD: show route prefix
+PREFIX: rib-received-prefix
+
+ACTUAL:
+
+Routing entry for 3.3.3.3/32
+  Known via "isis ring", distance 115, metric 20, type level-1
+  Installed Jul 20 23:45:44.003 for 00:14:45
+  Routing Descriptor Blocks
+    12.1.0.1, from 3.3.3.3, via GigabitEthernet0/0/0/0, Backup (remote)
+      Route metric is 20
+      Label: 0x3e85 (16005)
+      Tunnel ID: None
+      Extended communities count: 0
+      Path id:2       Path ref count:1
+  Route version is 0x1bf (447)
+  Local Label: 0x3e85 (16005)
+  IP Precedence: Not Set
+  QoS Group ID: Not Set
+  Route Priority: RIB_PRIORITY_NON_RECURSIVE_MEDIUM (5) SVD Type RIB_SVD_TYPE_LOCAL
+ Download Priority 1, Download Version 2412
+  No advertising protos. 
+
+MARKUP:
+
+Routing entry for XP<prefix>X3.3.3.3/32
+  Known via "XW<protocol>Xisis XW<instance>Xring", distance 115, metric 20, type level-1
+  Installed Jul 20 23:45:44.003 for 00:14:45
+  Routing Descriptor Blocks
+    XA<firsthopaddress>X12.1.0.1, from 3.3.3.3, via XI<firsthopinterface>XGigabitEthernet0/0/0/0, XW<pathtype>XBackup (XW<backuppathtype>Xremote)
+      Route metric is 20
+      Label: XH<labelhex>X0x3e85 (XN<label>X16005)
+      Tunnel ID: None
+      Extended communities count: 0
+      Path id:2       Path ref count:1
+  Route version is 0x1bf (447)
+  Local Label: WH<locallabelhex>X0x3e85 (XN<locallabel>X16005)
+  IP Precedence: Not Set
+  QoS Group ID: Not Set
+  Route Priority: RIB_PRIORITY_NON_RECURSIVE_MEDIUM (5) SVD Type RIB_SVD_TYPE_LOCAL
+ Download Priority 1, Download Version 2412
+  No advertising protos. 
+
+
+OS: IOX
+
+SHOWCMD: show cef prefix
+PREFIX: cef-prefix
+
+ACTUAL:
+
+4.4.4.4/32, version 2422, internal 0x4000001 (ptr 0x5781aff4) [1], 0x0 (0x5780092c), 0x0 (0x0)
+ Updated Jul 21 00:30:44.165 
+ local adjacency 24.1.0.4
+ Prefix Len 32, traffic index 0, precedence n/a, priority 1
+  gateway array (0x576aeb18) reference count 1, flags 0x2800000, source rib (5), 0 backups
+                [2 type 3 flags 0x10101 (0x57764794) ext 0x0 (0x0)]
+  LW-LDI[type=3, refc=1, ptr=0x5780092c, sh-ldi=0x57764794]
+   via 12.1.0.1, GigabitEthernet0/0/0/0, 8 dependencies, weight 0, class 0, backup (remote) [flags 0x8300]
+    path-idx 0 [0x57d1c504 0x0]
+    next hop 12.1.0.1
+    local adjacency
+
+
+    Load distribution: 0 (refcount 2)
+
+    Hash  OK  Interface                 Address
+    0     Y   GigabitEthernet0/0/0/2    24.1.0.4       
+
+MARKUP:
+
+XP<prefix>X4.4.4.4/32, version 2422, internal 0x4000001 (ptr 0x5781aff4) [1], 0x0 (0x5780092c), 0x0 (0x0)
+ Updated Jul 21 00:30:44.165 
+ local adjacency 24.1.0.4
+ Prefix Len 32, traffic index 0, precedence n/a, priority 1
+  gateway array (0x576aeb18) reference count 1, flags 0x2800000, source rib (5), 0 backups
+                [2 type 3 flags 0x10101 (0x57764794) ext 0x0 (0x0)]
+  LW-LDI[type=3, refc=1, ptr=0x5780092c, sh-ldi=0x57764794]
+   via XA<firsthopprefix>X12.1.0.1, XI<firsthopinterface>XGigabitEthernet0/0/0/0, 8 dependencies, weight 0, class 0, backup (remote) [flags 0x8300]
+    path-idx 0 [0x57d1c504 0x0]
+    next hop 12.1.0.1
+    local adjacency
+     local label XN<locallabel>X16005      labels imposed {XN<imposedlabel>X16005}
+
+
+    Load distribution: 0 (refcount 2)
+
+    Hash  OK  Interface                 Address
+    0     Y   GigabitEthernet0/0/0/2    24.1.0.4       
+
+OS: IOX
+
+SHOWCMD: show mpls forwarding prefix
+PREFIX: mpls-prefix
+
+ACTUAL:
+
+Local  Outgoing    Prefix             Outgoing     Next Hop        Bytes       
+Label  Label       or ID              Interface                    Switched    
+------ ----------- ------------------ ------------ --------------- ------------
+16005  16005       No ID              Gi0/0/0/0    12.1.0.1        0           
+       16005       No ID              Gi0/0/0/2    24.1.0.4        0           
+
+MARKUP:
+
+Local  Outgoing    Prefix             Outgoing     Next Hop        Bytes       
+Label  Label       or ID              Interface                    Switched    
+------ ----------- ------------------ ------------ --------------- ------------
+XN<locallabel>X16005  XN<outgoinglabel>X16005       No ID              XI<outgoinginterface>XGi0/0/0/0    XA<firsthopaddress>12.1.0.1        0           
+      XN<outgoinglabel1>16005       No ID              XI<outgoinginterface1>Gi0/0/0/2    XA<firsthopaddress>24.1.0.4        0           
+
+

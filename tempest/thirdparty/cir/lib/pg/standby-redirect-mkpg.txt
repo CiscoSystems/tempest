@@ -1,0 +1,57 @@
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# September 2015,     R.A. Winters <riwinter@cisco.com>
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: IOS
+
+CMD: SHOW_STANDBY_REDIRECT
+SHOWCMD: show standby redirect
+PREFIX: standby-redirect
+
+ACTUAL:
+
+#show standby redirect
+Interface    Redirects Unknown   Adv      Holddown
+Te0/1/0.2500 enabled   enabled   30       180
+
+Active                Hits  Interface Group Virtual IP            Virtual MAC
+local                 0     Te0/1/0.2500
+                                      1064  10.100.0.33           0000.0c9f.f428
+
+
+MARKUP:
+
+#show standby redirect
+Interface    Redirects Unknown   Adv      Holddown
+XI<intf>XTe0/1/0.2500 XW<redirect>Xenabled   XW<unknown>Xenabled   XN<adv>X30       XN<holddown>X180
+
+Active                Hits  Interface Group Virtual IP            Virtual MAC
+XS<addr>Xlocal                 XN<hits>X0     XI<active-intf>XTe0/1/0.2500
+                                      XN<group>X1064  XA<vaddr>X10.100.0.33           XM<vmac>X0000.0c9f.f428
+

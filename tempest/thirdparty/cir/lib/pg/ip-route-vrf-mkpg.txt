@@ -1,0 +1,73 @@
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# Dec 2015,     R.A. Winters <riwinter@cisco.com>
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: IOS
+
+CMD: SHOW_IP_VRF_ROUTE
+SHOWCMD:  show ip vrf {}
+PREFIX: vrf-route
+
+ACTUAL:
+
+#show ip route vrf  nrouter-ef9c92
+
+Routing Table: nrouter-ef9c92
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+       a - application route
+       + - replicated route, % - next hop override, p - overrides from PfR
+
+Gateway of last resort is 21.0.0.1 to network 0.0.0.0
+
+S*    0.0.0.0/0 [1/0] via 21.0.0.1, TenGigabitEthernet0/1/0.1538
+
+
+MARKUP:
+#show ip route vrf  nrouter-ef9c92
+
+Routing Table: XI<name>Xnrouter-ef9c92
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+       a - application route
+       + - replicated route, % - next hop override, p - overrides from PfR
+
+Gateway of last resort is XA<gateway>X21.0.0.1 to network XA<gw-network>X0.0.0.0
+
+XS<code>XS*    XA<route>X0.0.0.0/0 [1/0] via XA<next-hop>X21.0.0.1, XI<interface>XTenGigabitEthernet0/1/0.1538

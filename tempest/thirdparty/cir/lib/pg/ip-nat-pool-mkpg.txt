@@ -1,0 +1,68 @@
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# April 2015,     R.A. Winters <riwinter@cisco.com>
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: IOS
+
+CMD: SHOW_IP_NAT_POOL
+SHOWCMD:  show ip nat pool name {}
+PREFIX: nat-pool
+
+ACTUAL:
+
+#show ip nat pool name nrouter-b78631_nat_pool
+
+NAT Pool Statistics
+
+Pool name nrouter-b78631_nat_pool, id 74
+                              Assigned            Available
+  Addresses                          0                    1
+  UDP Low Ports                      0                  512
+  TCP Low Ports                      0                  512
+  UDP High Ports                     0                64511
+  TCP High Ports                     0                64511
+
+(Low ports are less than 1024. High ports are greater than or equal to 1024.)
+
+
+MARKUP:
+
+#show ip nat pool name nrouter-b78631_nat_pool
+
+NAT Pool Statistics
+
+Pool name XI<pool-name>Xnrouter-b78631_nat_pool, id XN<id>X74
+                              Assigned            Available
+  Addresses                          XN<assigned-addresses>X0                    XN<available-addresses>X1
+  UDP Low Ports                      XN<assigned-low-udp>X0                  XN<available-low-udp>X512
+  TCP Low Ports                      XN<assigned-low-tcp>X0                  XN<available-low-tcp>X512
+  UDP High Ports                     XN<assigned-high-udp>X0                XN<available-high-udp>X64511
+  TCP High Ports                     XN<assigned-high-tcp>X0                XN<available-high-tcp>X64511
+
+(Low ports are less than 1024. High ports are greater than or equal to 1024.)

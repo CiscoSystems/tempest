@@ -615,6 +615,39 @@ NetworkGroup = [
                 default=False,
                 help="The environment does not support network separation "
                      "between tenants."),
+    cfg.StrOpt('leaf1',
+               help='The name of leaf switch 1'),
+    cfg.StrOpt('leaf2',
+               help='The name of leaf switch 2'),
+    cfg.StrOpt('controller',
+               help='Name of the controller'),
+    cfg.StrOpt('controller_ip',
+               help='IP of the controller'),
+    cfg.StrOpt('controller_user',
+               default='stack',
+               help='User login name for the controller'),
+    cfg.StrOpt('controller_pw',
+               default='cisco',
+               help='User login password for the controller'),
+    cfg.StrOpt('controller_rc_file',
+               default='~/devstack/openrc',
+               help='File to source for Openstack env variables'),
+    cfg.StrOpt('compute1',
+               help='Name of compute server 1'),
+    cfg.StrOpt('compute2',
+               help='Name of compute server 2'),
+    cfg.StrOpt('bridge_type',
+               choices=['ovs', 'linux'],
+               help='Identifies the type of bridge used'),
+    cfg.StrOpt('region1_id',
+               default=None,
+               help='Region 1 ID used in building ASR config elements'),
+    cfg.StrOpt('region2_id',
+               default=None,
+               help='Region 2 ID used in building ASR config elements'),
+    cfg.IntOpt('network_interface_mtu',
+               default=1500,
+               help="MTU for network interface.")
 ]
 
 network_feature_group = cfg.OptGroup(name='network-feature-enabled',
@@ -945,7 +978,39 @@ ScenarioGroup = [
                choices=["udhcpc", "dhclient", ""],
                help='DHCP client used by images to renew DCHP lease. '
                     'If left empty, update operation will be skipped. '
-                    'Supported clients: "udhcpc", "dhclient"')
+                    'Supported clients: "udhcpc", "dhclient"'),
+    cfg.ListOpt('test_packet_sizes',
+                default=['56', '1456'],
+                help='A list of ICMP packet sizes used during testing'),
+    cfg.IntOpt('test_packet_count',
+               default=1,
+               help='The number of packets to send for each packet size'),
+    cfg.IntOpt('max_instances_per_tenant',
+               default=9,
+               help='The maximum number of instances for one tenant'),
+    cfg.IntOpt('num_routers_per_tenant',
+               default=1,
+               help='The number or Routers per tenant'),
+    cfg.IntOpt('number_vm_flap_interations',
+               default=2,
+               help='The number of times VMs are deleted/added during test'),
+    cfg.BoolOpt('network_node_segments_deleted',
+                default=True,
+                help='Indicates if VLAN/VxLANs associated with the network '
+                     'node are deleted when VMs are deleted'),
+    cfg.BoolOpt('advanced_vm_capabilities',
+                default=False,
+                help='Indicates if the VM has advanced testing features.'),
+    cfg.StrOpt('test_bed_id',
+               help='A file containing details for a test bed'),
+    cfg.BoolOpt('use_host_aggregates',
+                default=False,
+                help='Indicates if the test will use host aggregates when '
+                     'creating servers.'),
+    cfg.IntOpt('test_duration',
+               default=240,
+               help='The time in seconds to run the test.'),
+
 ]
 
 
@@ -996,6 +1061,115 @@ specify .* as the regex.
 """)
 ]
 
+
+baremetal_group = cfg.OptGroup(name='baremetal',
+                               title='Baremetal provisioning service options',
+                               help='When enabling baremetal tests, Nova '
+                                    'must be configured to use the Ironic '
+                                    'driver. The following parameters for the '
+                                    '[compute] section must be disabled: '
+                                    'console_output, interface_attach, '
+                                    'live_migration, pause, rescue, resize '
+                                    'shelve, snapshot, and suspend')
+
+BaremetalGroup = [
+    cfg.StrOpt('catalog_type',
+               default='baremetal',
+               help="Catalog type of the baremetal provisioning service"),
+    cfg.BoolOpt('driver_enabled',
+                default=False,
+                help="Whether the Ironic nova-compute driver is enabled"),
+    cfg.StrOpt('driver',
+               default='fake',
+               help="Driver name which Ironic uses"),
+    cfg.StrOpt('endpoint_type',
+               default='publicURL',
+               choices=['public', 'admin', 'internal',
+                        'publicURL', 'adminURL', 'internalURL'],
+               help="The endpoint type to use for the baremetal provisioning "
+                    "service"),
+    cfg.IntOpt('active_timeout',
+               default=300,
+               help="Timeout for Ironic node to completely provision"),
+    cfg.IntOpt('association_timeout',
+               default=30,
+               help="Timeout for association of Nova instance and Ironic "
+                    "node"),
+    cfg.IntOpt('power_timeout',
+               default=60,
+               help="Timeout for Ironic power transitions."),
+    cfg.IntOpt('unprovision_timeout',
+               default=300,
+               help="Timeout for unprovisioning an Ironic node. "
+                    "Takes longer since Kilo as Ironic performs an extra "
+                    "step in Node cleaning."),
+    cfg.StrOpt('node_ssh_user',
+               default="root",
+               help="User name used to authenticate to bare metal node."),
+    cfg.StrOpt('node_ssh_password',
+               default="cisco123",
+               help="Password used to authenticate to bare metal node."),
+    cfg.StrOpt('node_ssh_console_ip',
+               default="10.30.118.6",
+               help="IP of the compute bare metal node .")
+]
+
+cisco_group = cfg.OptGroup(name='cisco', title="Cisco specific Options")
+
+CiscoGroup = [
+    cfg.StrOpt('user_name',
+               default="admin",
+               help="User name for Cisco gear"),
+    cfg.StrOpt('user_pw',
+               default="cisco123",
+               help="Password for Cisco gear"),
+    cfg.StrOpt('asr1',
+               help="The name of the first ASR in the testbed"),
+    cfg.StrOpt('asr1_ip',
+               help="The IP Address of the first ASR in the testbed"),
+    cfg.StrOpt('asr1_ts_ip',
+               help="IP address of the Terminal Server for the first ASR"),
+    cfg.StrOpt('asr1_ts_port',
+               help="The Terminal Server port number for the first ASR"),
+    cfg.StrOpt('asr1_ts_pw',
+               help="The Terminal Server password for the first ASR"),
+    cfg.StrOpt('asr2',
+               help="The name of the second ASR in the testbed"),
+    cfg.StrOpt('asr2_ip',
+               help="The IP Address of the second ASR in the testbed"),
+    cfg.StrOpt('asr2_ts_ip',
+               help="IP address of the Terminal Server for the second ASR"),
+    cfg.StrOpt('asr2_ts_port',
+               help="The Terminal Server port number for the second ASR"),
+    cfg.StrOpt('asr2_ts_pw',
+               help="The Terminal Server password for the second ASR"),
+    cfg.StrOpt('asr1_internal_intf',
+               default='TenGigabitEthernet0/1/0',
+               help="The internal interface for the first ASR"),
+    cfg.StrOpt('asr1_external_intf',
+               default='TenGigabitEthernet0/1/0',
+               help="The external interface for the first ASR"),
+    cfg.StrOpt('asr2_internal_intf',
+               default='TenGigabitEthernet0/1/0',
+               help="The internal interface for the second ASR"),
+    cfg.StrOpt('asr2_external_intf',
+               default='TenGigabitEthernet0/1/0',
+               help="The external interface for the second ASR"),
+    cfg.StrOpt('leaf1',
+               help="The name of the leaf1 switch in the testbed"),
+    cfg.StrOpt('leaf1_ip',
+               help="The IP Address of the leaf1 switch in the testbed"),
+    cfg.StrOpt('leaf2',
+               help="The name of the leaf2 switch in the testbed"),
+    cfg.StrOpt('leaf2_ip',
+               help="The IP Address of the leaf2 switch in the testbed"),
+    cfg.BoolOpt('test_asr_cfg_agent_replay',
+                help='Tests if the ASR Config Agent replayed after fail '
+                     'over',
+                default=False),
+]
+
+
 DefaultGroup = [
     cfg.BoolOpt('pause_teardown',
                 default=False,
@@ -1027,6 +1201,7 @@ _opts = [
     (scenario_group, ScenarioGroup),
     (service_available_group, ServiceAvailableGroup),
     (debug_group, DebugGroup),
+    (cisco_group, CiscoGroup),
     (None, DefaultGroup)
 ]
 

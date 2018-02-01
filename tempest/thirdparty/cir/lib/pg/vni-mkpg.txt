@@ -1,0 +1,31 @@
+
+OS: NXOS
+#
+# December 11th, 2013
+#
+#
+#
+# Copyright (c) 2013 by cisco Systems, Inc.
+# All rights reserved.
+
+CMD: SHOW_VNI
+SHOWCMD: show vni
+PREFIX: vni-table
+ACTUAL:
+
+leaf0# show vni 5000
+VNI      Status   BD       VSI
+--------------------------------------------
+
+5000     Up      300     VSI-Ethernet2/3.4095
+                         VSI-Ethernet2/4.4095
+                         VSI-Ethernet2/4.4095
+
+MARKUP:
+
+leaf0# show vni 5000
+VNI      Status   BD       VSI
+--------------------------------------------
+
+XN<vni>X5000     XW<status>XUp      XN<bd>X300     XI<intf>XVSI-Ethernet2/3.4095
+                         XI<alt-intf>XVSI-Ethernet2/4.4095

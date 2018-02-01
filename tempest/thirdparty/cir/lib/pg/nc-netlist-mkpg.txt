@@ -1,0 +1,53 @@
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# January 2016,     R.A. Winters <riwinter@cisco.com>
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: DCOS
+
+CMD: NC_NET_LIST
+SHOWCMD: neutron net-list
+PREFIX: nc_nets
+
+ACTUAL:
+
+
++--------------------------------------+-----------------------------------+-----------------------------------------------------+
+| id                                   | name                              | subnets                                             |
++--------------------------------------+-----------------------------------+-----------------------------------------------------+
+| 4a0d3b93-49fa-42d7-89a8-7303a93808ba | tempest-network-smoke--1824200742 | 9c81944f-ee33-47cc-a5d8-0a068988eb4f 10.100.0.48/28 |
++--------------------------------------+-----------------------------------+-----------------------------------------------------+
+
+
+MARKUP:
+
++--------------------------------------+-----------------------------------+-----------------------------------------------------+
+| id                                   | name                              | subnets                                             |
++--------------------------------------+-----------------------------------+-----------------------------------------------------+
+| XI<id>X4a0d3b93-49fa-42d7-89a8-7303a93808ba | XI<name>Xtempest-network-smoke--1824200742 | XI<subnet-id>X9c81944f-ee33-47cc-a5d8-0a068988eb4f XA<subnet>X10.100.0.48/XN<subnet-mask>X28 |
++--------------------------------------+-----------------------------------+-----------------------------------------------------+

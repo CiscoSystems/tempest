@@ -1,0 +1,49 @@
+
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# April 2015,     R.A. Winters <riwinter@cisco.com>
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: IOS
+
+CMD: SHOW_IP_ACCESS_LIST
+SHOWCMD:  show ip access-lists {}
+PREFIX: acl
+
+ACTUAL:
+
+# show access-lists neutron_acl_1509
+Standard IP access list neutron_acl_1509
+    10 permit 10.100.0.32, wildcard bits 0.0.0.15
+
+
+MARKUP:
+
+# show access-lists neutron_acl_1509
+Standard IP access list XI<name>Xneutron_acl_1509
+    XN<priorty>X10 XW<action>Xpermit XA<address>X10.100.0.32, wildcard bits XA<wildcard>X0.0.0.15

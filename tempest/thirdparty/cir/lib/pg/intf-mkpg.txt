@@ -1,0 +1,125 @@
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# April 2015,     R.A. Winters <riwinter@cisco.com>
+
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: NXOS
+
+CMD: SHOW_INTERFACE
+SHOWCMD: show interface | no-more
+PREFIX: intf
+
+ACTUAL:
+
+# show interface eth1/34
+Ethernet1/34 is up
+admin state is up, Dedicated Interface
+  Hardware: 1000/10000 Ethernet, address: fc5b.394f.65c1 (bia fc5b.394f.65c1)
+  Description: connection to UCS qa4 Intel 4x10G adapter port 2 - eth3
+  MTU 9216 bytes, BW 10000000 Kbit, DLY 10 usec
+  reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, medium is broadcast
+  Port mode is trunk
+  full-duplex, 10 Gb/s, media type is 10G
+  Beacon is turned off
+  Auto-Negotiation is turned on
+  Input flow-control is off, output flow-control is off
+  Auto-mdix is turned off
+  Rate mode is dedicated
+  Switchport monitor is off
+  EtherType is 0x8100
+  EEE (efficient-ethernet) : n/a
+  Last link flapped 5week(s) 5day(s)
+  Last clearing of "show interface" counters 00:13:57
+  0 interface resets
+  30 seconds input rate 48 bits/sec, 0 packets/sec
+  30 seconds output rate 1720 bits/sec, 2 packets/sec
+  Load-Interval #2: 5 minute (300 seconds)
+    input rate 48 bps, 0 pps; output rate 1.70 Kbps, 2 pps
+  RX
+    5954 unicast packets  28 multicast packets  0 broadcast packets
+    5982 input packets  32660602 bytes
+    3900 jumbo packets  0 storm suppression packets
+    0 runts  0 giants  0 CRC  0 no buffer
+    0 input error  0 short frame  0 overrun   0 underrun  0 ignored
+    0 watchdog  0 bad etype drop  0 bad proto drop  0 if down drop
+    0 input with dribble  0 input discard
+    0 Rx pause
+  TX
+    5980 unicast packets  2528 multicast packets  1 broadcast packets
+    8509 output packets  32890534 bytes
+    3900 jumbo packets
+    0 output error  0 collision  0 deferred  0 late collision
+    0 lost carrier  0 no carrier  0 babble  0 output discard
+    0 Tx pause
+
+
+MARKUP:
+
+# show interface eth1/34
+XI<name>XEthernet1/34 is XW<state>Xup
+admin state is up, Dedicated Interface
+  Hardware: XNX1000/XNX10000 Ethernet, address: XM<mac>Xfc5b.394f.65c1 (bia XM<bia>Xfc5b.394f.65c1)
+  Description: connection to UCS qa4 Intel 4x10G adapter port 2 - eth3
+  MTU XN<mtu>X9216 bytes, BW XN<bw>X10000000 XW<speed>XKbit, DLY XN<delay>X10 XW<time-unit>Xusec
+  reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, medium is broadcast
+  Port mode is trunk
+  full-duplex, 10 Gb/s, media type is 10G
+  Beacon is turned off
+  Auto-Negotiation is turned on
+  Input flow-control is off, output flow-control is off
+  Auto-mdix is turned off
+  Rate mode is dedicated
+  Switchport monitor is off
+  EtherType is 0x8100
+  EEE (efficient-ethernet) : n/a
+  Last link flapped 5week(s) 5day(s)
+  Last clearing of "show interface" counters 00:13:57
+  0 interface resets
+  30 seconds input rate 48 bits/sec, 0 packets/sec
+  30 seconds output rate 1720 bits/sec, 2 packets/sec
+  Load-Interval #2: 5 minute (300 seconds)
+    input rate 48 bps, 0 pps; output rate 1.70 Kbps, 2 pps
+  RX
+    5954 unicast packets  28 multicast packets  0 broadcast packets
+    5982 input packets  32660602 bytes
+    3900 jumbo packets  0 storm suppression packets
+    0 runts  0 giants  0 CRC  0 no buffer
+    0 input error  0 short frame  0 overrun   0 underrun  0 ignored
+    0 watchdog  0 bad etype drop  0 bad proto drop  0 if down drop
+    0 input with dribble  0 input discard
+    0 Rx pause
+  TX
+    5980 unicast packets  2528 multicast packets  1 broadcast packets
+    8509 output packets  32890534 bytes
+    3900 jumbo packets
+    0 output error  0 collision  0 deferred  0 late collision
+    0 lost carrier  0 no carrier  0 babble  0 output discard
+    0 Tx pause

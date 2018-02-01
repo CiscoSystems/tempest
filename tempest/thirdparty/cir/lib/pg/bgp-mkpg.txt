@@ -1,0 +1,139 @@
+#
+# December 12 2011, Christian E. Hopps
+#
+# Copyright (c) 2011, 2014 by cisco Systems, Inc.
+# All rights reserved.
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# S - non-space
+# T - time (00:00:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: iox
+
+CMD: SHOW_BGP_NEIGHBOR
+SHOWCMD: show bgp neighbor {}
+PREFIX: bgp-nbr
+
+MARKUP:
+
+BGP neighbor is XA<addr>X10.10.10.1
+ Remote AS XIX100, local AS XIX100, XR<linktype>Xinternal link
+ Remote router ID XAX192.168.0.1
+  BGP state = XW<state>XEstablished, up for XT<uptime>X00:01:19
+  Last read 00:00:04, Last read before reset 00:00:00
+  Hold time is 30, keepalive interval is 10 seconds
+  Configured hold time: 30, keepalive: 10, min acceptable hold time: 3
+  Last write 00:00:04, attempted 19, written 19
+  Second last write 00:00:14, attempted 19, written 19
+  Last write before reset 00:00:00, attempted 0, written 0
+  Second last write before reset 00:00:00, attempted 0, written 0
+  Last write pulse rcvd  Dec 14 08:49:45.632 last full not set pulse count 22
+  Last write pulse rcvd before reset 00:00:00
+  Socket not armed for io, armed for read, armed for write
+  Last write thread event before reset 00:00:00, second last 00:00:00
+  Last KA expiry before reset 00:00:00, second last 00:00:00
+  Last KA error before reset 00:00:00, KA not sent 00:00:00
+  Last KA start before reset 00:00:00, second last 00:00:00
+  Precedence: internet
+  Multi-protocol capability received
+  Neighbor capabilities:
+    Route refresh: advertised and received
+    4-byte AS: advertised and received
+    Address family IPv4 Unicast: advertised and received
+  Received 11 messages, 0 notifications, 0 in queue
+  Sent 11 messages, 0 notifications, 0 in queue
+  Minimum time between advertisement runs is 0 secs
+
+ For Address Family: IPv4 Unicast
+  BGP neighbor version 6
+  Update group: 0.2 Filter-group: 0.1  No Refresh request being processed
+  Route refresh request: received 0, sent 0
+  3 accepted prefixes, 1 are bestpaths
+  Cumulative no. of prefixes denied: 0.
+  Prefix advertised 3, suppressed 0, withdrawn 0
+  Maximum prefixes allowed 524288
+  Threshold for warning message 75%, restart interval 0 min
+  AIGP is enabled
+  An EoR was received during read-only mode
+  Last ack version 6, Last synced ack version 0
+  Outstanding version objects: current 0, max 1
+  Additional-paths operation: None
+
+  Connections established 1; dropped 0
+  Local host: 10.10.10.2, Local port: 56335
+  Foreign host: 10.10.10.1, Foreign port: 179
+  Last reset 00:00:00
+
+CMD: SHOW_BGP_UNICAST_PREFIX
+SHOWCMD: show bgp {} unicast {}
+PREFIX: bgp-unicast-prefix
+
+ACTUAL:
+
+BGP routing table entry for 10.10.10.0/24
+Versions:
+  Process           bRIB/RIB  SendTblVer
+  Speaker                  3           3
+Last Modified: Jan 15 09:11:11.000 for 00:39:30
+Paths: (2 available, best #1)
+  Advertised to peers (in unique update groups):
+    10.10.10.2
+  Path #1: Received by speaker 0
+  Advertised to peers (in unique update groups):
+    10.10.10.2
+  Local
+    0.0.0.0 from 0.0.0.0 (192.168.0.1)
+      Origin incomplete, metric 0, localpref 100, weight 32768, valid, redistributed, best, group-best, import-candidate
+      Received Path ID 0, Local Path ID 1, version 3
+  Path #2: Received by speaker 0
+  Not advertised to any peer
+  Local
+    10.10.10.2 from 10.10.10.2 (192.168.0.2)
+      Origin incomplete, metric 0, localpref 100, valid, internal
+      Received Path ID 0, Local Path ID 0, version 0
+BGP router identifier 192.168.0.1, local AS number 100
+
+MARKUP:
+
+BGP routing table entry for XP<prefix>X10.10.10.0/24
+Versions:
+  Process           bRIB/RIB  SendTblVer
+  Speaker                  3           3
+Last Modified: Jan 15 09:11:11.000 for 00:39:30
+Paths: (XN<num-paths>X2 available, best #XN<best-index>X1)
+  Advertised to peers (in unique update groups):
+    10.10.10.2
+  Path #XN<path>X1: Received by speaker XN<recv-by>X0
+  Advertised to peers (in unique update groups):
+    10.10.10.2
+  Local
+    0.0.0.0 from 0.0.0.0 (192.168.0.1)
+      Origin XW<origin>Xincomplete, metric XN<metric>X0, localpref XN<localpref>X100
+      Origin Xw<origin>Xincomplete, metric Xn<metric>X0, localpref Xn<localpref>X100, weight XN<weight>X32768
+      Origin Xw<origin>Xincomplete, metric Xn<metric>X0, localpref Xn<localpref>X100, weight Xn<weight>X32768, XR<flags>Xvalid, redistributed, best, group-best, import-candidate
+      Received Path ID XN<recv-path-id>X0, Local Path ID XN<local-path-id>X1, version XN<version>X3
+  Path #2: Received by speaker 0
+  Not advertised to any peer
+  Local
+    10.10.10.2 from 10.10.10.2 (192.168.0.2)
+      Origin incomplete, metric 0, localpref 100, valid, internal
+      Received Path ID 0, Local Path ID 0, version 0
+BGP router identifier 192.168.0.1, local AS number 100

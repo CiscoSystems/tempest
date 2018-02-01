@@ -1,0 +1,91 @@
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# April 2015,     R.A. Winters <riwinter@cisco.com>
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: NXOS
+
+CMD: SHOW_INTERFACE_COUNTERS_DETAIL
+SHOWCMD: show interface counters detailed | no-more
+PREFIX: intf-counters
+
+ACTUAL:
+
+# show interface counters detailed
+Ethernet1/1/2
+  Rx Packets:                                     1863853
+  Rx Unicast Packets:                             1722941
+  Rx Multicast Packets:                            139168
+  Rx Broadcast Packets:                              1744
+  Rx Jumbo Packets:                                  2897
+  Rx Bytes:                                     144956277
+  Rx Packets from 0 to 64 bytes:                  1685551
+  Rx Packets from 65 to 127 bytes:                 122640
+  Rx Packets from 128 to 255 bytes:                  9559
+  Rx Packets from 256 to 511 bytes:                 25698
+  Rx Packets from 512 to 1023 bytes:                16903
+  Rx Packets from 1024 to 1518 bytes:                 605
+  Tx Packets:                                    10506728
+  Tx Unicast Packets:                              154365
+  Tx Multicast Packets:                          10348783
+  Tx Broadcast Packets:                              3580
+  Tx Jumbo Packets:                                  6849
+  Tx Bytes:                                     826630601
+  Tx Packets from 0 to 64 bytes:                   158261
+  Tx Packets from 65 to 127 bytes:               10115713
+  Tx Packets from 128 to 255 bytes:                 37026
+  Tx Packets from 256 to 511 bytes:                170703
+  Tx Packets from 512 to 1023 bytes:                17327
+  Tx Packets from 1024 to 1518 bytes:                 849
+
+MARKUP:
+XI<interface-name>XEthernet1/1/2
+  Rx Packets:                                     XN<rx-total-pkts>X1863853
+  Rx Unicast Packets:                             XN<rx-unicast-pkts>X1722941
+  Rx Multicast Packets:                            XN<rx-multicast-pkts>X139168
+  Rx Broadcast Packets:                              XN<rx-broadcast-pkts>X1744
+  Rx Jumbo Packets:                                  XN<rx-jumbo-pkts>X2897
+  Rx Bytes:                                     XN<rx-total-bytes>X144956277
+  Rx Packets from 0 to 64 bytes:                  XN<rx-pkts-0-64-bytes>X1685551
+  Rx Packets from 65 to 127 bytes:                 XN<rx-pkts-65-127-bytes>X122640
+  Rx Packets from 128 to 255 bytes:                  XN<rx-pkts-128-255-bytes>XX9559
+  Rx Packets from 256 to 511 bytes:                 XN<rx-pkts-256-511-bytes>X25698
+  Rx Packets from 512 to 1023 bytes:                XN<rx-pkts-512-1023-bytes>X16903
+  Rx Packets from 1024 to 1518 bytes:                 XN<rx-pkts-1024-1518>X605
+  Tx Packets:                                    XN<tx-total-pkts>X10506728
+  Tx Unicast Packets:                              XN<tx-unicast-pkts>X154365
+  Tx Multicast Packets:                          XN<tx-multicast-pkts>X10348783
+  Tx Broadcast Packets:                              XN<tx-broadcast-pkts>X3580
+  Tx Jumbo Packets:                                  XN<tx-jumbo-pkts>X6849
+  Tx Bytes:                                     XN<tx-total-bytes>X826630601
+  Tx Packets from 0 to 64 bytes:                   XN<tx-pkts-0-64-bytes>X158261
+  Tx Packets from 65 to 127 bytes:               XN<tx-pkts-65-127-bytes>X10115713
+  Tx Packets from 128 to 255 bytes:                 XN<tx-pkts-128-255-bytes>X37026
+  Tx Packets from 256 to 511 bytes:                XN<tx-pkts-256-511-bytes>X170703
+  Tx Packets from 512 to 1023 bytes:                XN<tx-pkts-512-1023-bytes>X17327
+  Tx Packets from 1024 to 1518 bytes:                 XN<tx-pkts-1024-1518-bytes>X849

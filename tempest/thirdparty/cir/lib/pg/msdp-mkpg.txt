@@ -1,0 +1,142 @@
+#
+# May 11 2011, Christian E. Hopps
+#
+# Copyright (c) 2013 by cisco Systems, Inc.
+# All rights reserved.
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: IOX
+
+SHOWCMD: show msdp peer
+PREFIX: msdp-peer
+
+ACTUAL:
+
+MSDP Peer 192.168.0.3 (?), AS 100
+Description:
+  Connection status:
+    State: Connect, Resets: 0, Connection Source: 192.168.0.1
+    Uptime(Downtime): 11:06:41, SA messages received: 0
+    TLV messages sent/received: 0/0
+  Output messages discarded: 0
+    Connection and counters cleared 16:19:05 ago
+  SA Filtering:
+    Input (S,G) filter: none
+    Input RP filter: none
+    Output (S,G) filter: none
+    Output RP filter: none
+  SA-Requests:
+    Input filter: none
+    Sending SA-Requests to peer: disabled
+  Password: None
+  Peer ttl threshold: 2
+  Input queue size: 0, Output queue size: 0
+  KeepAlive timer period: 30
+  Peer Timeout timer period: 75
+
+MARKUP:
+
+MSDP Peer XA<peer>X192.168.0.3 (?), AS XN<as>X100
+Description:
+  Connection status:
+    State: XWXConnect, Resets: XNX0, Connection Source: XAX192.168.0.1
+    Uptime(Downtime): XT<uptime>X11:06:41, SA messages received: 0
+    TLV messages sent/received: 0/0
+  Output messages discarded: 0
+    Connection and counters cleared 16:19:05 ago
+  SA Filtering:
+    Input (S,G) filter: none
+    Input RP filter: none
+    Output (S,G) filter: none
+    Output RP filter: none
+  SA-Requests:
+    Input filter: none
+    Sending SA-Requests to peer: disabled
+  Password: XRXNone
+  Peer ttl threshold: 2
+  Input queue size: 0, Output queue size: 0
+  KeepAlive timer period: XN<keepalive-interval>X30
+  Peer Timeout timer period: XN<keepalive-timeout>X75
+
+OS: NXOS
+
+SHOWCMD: show ip msdp peer
+PREFIX: msdp-peer
+
+ACTUAL:
+
+MSDP peer 192.168.0.3 for VRF "default"
+AS 0, local address: 192.168.0.1 (loopback0)
+  Description: none
+  Connection status: Established
+    Uptime(Downtime): 11:12:41
+    Password: not set
+  Keepalive Interval: 60 sec
+  Keepalive Timeout: 90 sec
+  Reconnection Interval: 10 sec
+  Policies:
+    SA in: none, SA out: none
+    SA limit: unlimited
+  Member of mesh-group: no
+  Statistics (in/out):
+    Last messaged received: 00:00:45
+    SAs: 0/0, SA-Requests: 0/0, SA-Responses: 0/0
+    In/Out Ctrl Msgs: 0/0, In/Out Data Msgs: 0/0
+    Remote/Local Port 639/61655
+    Keepalives: 690/690, Notifications: 0/0
+    RPF check failures: 0
+    Cache Lifetime: 00:03:30
+    Established Transitions: 1
+    Connection Attempts: 1
+    Discontinuity Time: 11:12:41
+
+MARKUP:
+
+MSDP peer XA<peer>X192.168.0.3 for VRF "XXX<[^"]+><vrf>XXXdefault"
+AS XN<as>X0, local address: XA<connection-source>X192.168.0.1
+  Description: XRXnone
+  Connection status: XW<state>XEstablished
+    Uptime(Downtime): XT<uptime>X11:12:41
+    Password: XRXnot set
+  Keepalive Interval: XNX60 sec
+  Keepalive Timeout: XNX90 sec
+  Reconnection Interval: 10 sec
+  Policies:
+    SA in: none, SA out: none
+    SA limit: unlimited
+  Member of mesh-group: no
+  Statistics (in/out):
+    Last messaged received: 00:00:45
+    SAs: 0/0, SA-Requests: 0/0, SA-Responses: 0/0
+    In/Out Ctrl Msgs: 0/0, In/Out Data Msgs: 0/0
+    Remote/Local Port 639/61655
+    Keepalives: 690/690, Notifications: 0/0
+    RPF check failures: XNX0
+    Cache Lifetime: 00:03:30
+    Established Transitions: XNX1
+    Connection Attempts: XNX1
+    Discontinuity Time: 11:12:41

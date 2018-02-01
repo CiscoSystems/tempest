@@ -1,0 +1,126 @@
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# April 2015,     R.A. Winters <riwinter@cisco.com>
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: IOS
+
+CMD: SHOW_VLAN_COUNTERS
+SHOWCMD: show vlan counters | no-more
+PREFIX: vlan-counters
+
+ACTUAL:
+# show vlan counters
+Vlan Id                             :759
+L2 Unicast Octets                   :--
+L2 Unicast Packets                  :--
+L2 Multicast Octets                 :--
+L2 Multicast Packets                :--
+L2 Broadcast Octets                 :--
+L2 Broadcast Packets                :--
+L2 Unknown Octets                   :--
+L2 Unknown Packets                  :--
+L3 Routed Octets In                 :--
+L3 Routed Packets In                :--
+L3 Routed Octets Out                :--
+L3 Routed Packets Out               :--
+L3 Multicast Octets In              :--
+L3 Multicast Packets In             :--
+L3 Multicast Octets Out             :--
+L3 Multicast Packets Out            :--
+L3 Unicast Octets In                :1234
+L3 Unicast Packets In               :2345
+L3 Unicast Octets Out               :3456
+L3 Unicast Packets Out              :4567
+Total Octets In                     :179783
+Total Packets In                    :1636
+Total Octets Out                    :185971
+Total Packets Out                   :1792
+
+MARKUP:
+Vlan Id                             :XN<vlan-id>X759
+L2 Unicast Octets                   :--
+L2 Unicast Packets                  :--
+L2 Multicast Octets                 :--
+L2 Multicast Packets                :--
+L2 Broadcast Octets                 :--
+L2 Broadcast Packets                :--
+L2 Unknown Octets                   :--
+L2 Unknown Packets                  :--
+L3 Routed Octets In                 :XN<l3-routed-octets-in>X0
+L3 Routed Packets In                :XN<l3-routed-pkts-in>X0
+L3 Routed Octets Out                :XN<l3-routed-octets-out>X0
+L3 Routed Packets Out               :XN<l3-routed-pkts-out>X0
+L3 Multicast Octets In              :XN<l3-mcast-octets-in>X0
+L3 Multicast Packets In             :XN<l3-mcast-pkts-in>X0
+L3 Multicast Octets Out             :XN<l3-mcast-octets-out>X0
+L3 Multicast Packets Out            :XN<l3-mcast-pkts-out>X0
+L3 Unicast Octets In                :XN<l3-unicast-octets-in>X1234
+L3 Unicast Packets In               :XN<l3-unicast-pkts-in>X2345
+L3 Unicast Octets Out               :XN<l3-unicast-octets-out>X3456
+L3 Unicast Packets Out              :XN<l3-unicast-pkts-out>X4567
+Total Octets In                     :XN<total-octets-in>X179783
+Total Packets In                    :XN<total-pkts-in>X1636
+Total Octets Out                    :XN<total-octets-out>X185971
+Total Packets Out                   :XN<total-pkts-out>X1792
+
+OS: NXOS
+
+CMD: SHOW_VLAN_COUNTERS
+SHOWCMD: show vlan counters | no-more
+PREFIX: vlan-counters
+
+ACTUAL:
+
+
+Vlan Id                             :2501
+Unicast Octets In                  :67684
+Unicast Packets In                 :606
+Multicast Octets In                :0
+Multicast Packets In               :0
+Broadcast Octets In                :2400
+Broadcast Packets In               :12
+Unicast Octets Out                 :157232
+Unicast Packets Out                :1212
+L3 Unicast Octets In                :0
+L3 Unicast Packets In               :0
+
+
+MARKUP:
+
+Vlan Id                             :XN<vlan-id>X2501
+Unicast Octets In                  :XN<total-octets-in>X67684
+Unicast Packets In                 :XN<total-pkts-in>X606
+Multicast Octets In                :0
+Multicast Packets In               :0
+Broadcast Octets In                :2400
+Broadcast Packets In               :12
+Unicast Octets Out                 :XN<total-octets-out>X157232
+Unicast Packets Out                :XN<total-pkts-out>X1212
+L3 Unicast Octets In                :0
+L3 Unicast Packets In               :0

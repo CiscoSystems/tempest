@@ -1,0 +1,87 @@
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# April 2015,     R.A. Winters <riwinter@cisco.com>
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: NXOS
+
+CMD: SHOW_BRIDGE
+SHOWCMD: brctl show\n
+PREFIX: bridge
+
+
+ACTUAL:
+bridge name     bridge id               STP enabled     interfaces
+brq31e51239-9d          8000.5ab1dab272e8       no              tap4799f4bb-bd
+                                                        tap8977b910-51
+                                                        tap96d81902-00
+                                                        vxlan-1004
+brq709013d4-13          8000.0ef91b4d7132       no              tap4a30c5b7-07
+                                                        tap560fb995-83
+                                                        tape8fbb1d7-23
+                                                        tapf06e7010-c6
+                                                        vxlan-1002
+brq7ef8ae12-33          8000.02ef3648185c       no              tap68f2c0e3-12
+                                                        tapac987265-fb
+                                                        vxlan-1006
+brq8e853ffe-ed          8000.4e7299927ebd       no              tap4994e078-d9
+                                                        tapaab790ac-2e
+                                                        vxlan-1001
+brqd7f09477-c5          8000.26c5814f89c0       no              tap0b7edf32-36
+                                                        tap34e39460-35
+                                                        vxlan-1003
+brqd90ef524-3f          8000.321d89830bba       no              tap3163da90-1a
+                                                        tapaf085732-e1
+                                                        tapb12266c8-a6
+                                                        vxlan-1005
+virbr0          8000.000000000000       yes
+
+
+MARKUP:
+bridge name     bridge id               STP enabled     interfaces
+XXX<brq[-A-Za-z0-9\._/:]+><name>XXXXbrq31e51239-9d              XI<id>X8000.5ab1dab272e8        XW<stp>Xno              XXX<tap[-A-Za-z0-9\._/:]+><tap>XXXtap4799f4bb-bd
+                            XXX<(vlan|vxlan)[-A-Za-z0-9\._/:]+><interface>XXXvxlan-1002
+brq709013d4-13          8000.0ef91b4d7132       no              tap4a30c5b7-07
+                                                        tap560fb995-83
+                                                        tape8fbb1d7-23
+                                                        tapf06e7010-c6
+                                                        vxlan-1002
+brq7ef8ae12-33          8000.02ef3648185c       no              tap68f2c0e3-12
+                                                        tapac987265-fb
+                                                        vxlan-1006
+brq8e853ffe-ed          8000.4e7299927ebd       no              tap4994e078-d9
+                                                        tapaab790ac-2e
+                                                        vxlan-1001
+brqd7f09477-c5          8000.26c5814f89c0       no              tap0b7edf32-36
+                                                        tap34e39460-35
+                                                        vxlan-1003
+brqd90ef524-3f          8000.321d89830bba       no              tap3163da90-1a
+                                                        tapaf085732-e1
+                                                        tapb12266c8-a6
+                                                        vxlan-1005
+virbr0          8000.000000000000       yes

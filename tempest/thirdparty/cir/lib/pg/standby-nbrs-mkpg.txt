@@ -1,0 +1,52 @@
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# September 2015,     R.A. Winters <riwinter@cisco.com>
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: IOS
+
+CMD: SHOW_STANDBY_NBRS
+SHOWCMD: show standby neighbors
+PREFIX: standby-nbrs
+
+ACTUAL:
+
+#show standby neighbors
+HSRP neighbors on TenGigabitEthernet0/1/0.2500
+  10.100.0.34
+    No active groups
+    Standby groups: 1064
+
+
+MARKUP:
+
+#show standby neighbors
+HSRP neighbors on XI<intf>XTenGigabitEthernet0/1/0.2500
+  XA<addr>X10.100.0.34
+    Active groups: XN<active-groups>X1064
+    Standby groups: XN<standby-groups>X1064

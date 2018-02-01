@@ -1,0 +1,179 @@
+#
+# October 12 2011, Christian E. Hopps
+#
+# Copyright (c) 2011 by cisco Systems, Inc.
+# All rights reserved.
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+SHOWCMD: show ospf interface
+PREFIX: ospf-intf
+
+ACTUAL:
+
+GigabitEthernet0/2/0/0 is up, line protocol is up
+  Internet Address 11.11.11.2/24, Area 1
+  Process ID 1, Router ID 192.168.0.2, Network Type BROADCAST, Cost: 1
+  Transmit Delay is 1 sec, State BDR, Priority 1, MTU 1500, MaxPktSz 1500
+  Designated Router (ID) 192.168.0.3, Interface address 11.11.11.3
+  Backup Designated router (ID) 192.168.0.2, Interface address 11.11.11.2
+  Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
+    Hello due in 00:00:03
+  Index 1/2, flood queue length 0
+  Next 0(0)/0(0)
+  Last flood scan length is 1, maximum is 1
+  Last flood scan time is 0 msec, maximum is 0 msec
+  LS Ack List: current length 0, high water mark 3
+  Neighbor Count is 1, Adjacent neighbor count is 1
+    Adjacent with neighbor 192.168.0.3  (Designated Router)
+  Suppress hello for 0 neighbor(s)
+  Multi-area interface Count is 0
+
+MARKUP:
+
+XIXGigabitEthernet0/2/0/0 is XWXup, line protocol is XWXup
+  Internet Address XPX11.11.11.2/24, Area XW<area>X1
+  Process ID XWX1, Router ID XAX192.168.0.2, Network Type XWXBROADCAST, Cost: XNX1
+  Transmit Delay is XNX1 sec, State XWXBDR, Priority XNX1, MTU XNX1500, MaxPktSz XNX1500
+  Designated Router (ID) XA<dr>X192.168.0.3, Interface address XA<dr_addr>X11.11.11.3
+  Backup Designated router (ID) XA<bdr>X192.168.0.2, Interface address XA<bdr_addr>X11.11.11.2
+  Timer intervals configured, Hello XNX<hello_int>10, Dead XN<dead_int>X40, Wait XN<wait_int>X40, Retransmit XN<retransmit_int>X5
+    Hello due in XT<hello_due>X00:00:03
+  Index 1/2, flood queue length XNX0
+  Next 0(0)/0(0)
+  Last flood scan length is XNX1, maximum is XNX1
+  Last flood scan time is XNX0 msec, maximum is XNX0 msec
+  LS Ack List: current length XNX0, high water mark XNX3
+  Neighbor Count is XNX1, Adjacent neighbor count is XNX1
+    Adjacent with neighbor 192.168.0.3  (Designated Router)
+  Suppress hello for XNX0 neighbor(s)
+  Multi-area interface Count is XNX0
+
+SHOWCMD: show ospf neighbor detail
+PREFIX: ospf-nbr
+ACTUAL:
+
+ Neighbor 192.168.0.1, interface address 10.10.10.1
+    In the area 0 via interface GigabitEthernet0/2/0/1
+    Neighbor priority is 1, State is FULL, 6 state changes
+    DR is 10.10.10.2 BDR is 10.10.10.1
+    Options is 0x52
+    LLS Options is 0x1 (LR)
+    Dead timer due in 00:00:34
+    Neighbor is up for 00:03:15
+    Number of DBD retrans during last exchange 0
+    Index 1/1, retransmission queue length 0, number of retransmission 0
+    First 0(0)/0(0) Next 0(0)/0(0)
+    Last retransmission scan length is 0, maximum is 0
+    Last retransmission scan time is 0 msec, maximum is 0 msec
+    LS Ack list: NSR-sync pending 0, high water mark 0
+
+MARKUP:
+
+ Neighbor XAX192.168.0.1, interface address XAX10.10.10.1
+    In the area XWX0 via interface XIXGigabitEthernet0/2/0/1
+    Neighbor priority is XNX1, State is XWXFULL, XN<state-changes>X6 state changes
+    DR is XAX10.10.10.2 BDR is XAX10.10.10.1
+    Options is XWX0x52
+    LLS Options is XWX0x1 (LR)
+    Dead timer due in XTX00:00:34
+    Neighbor is up for XTX00:03:15
+    Number of DBD retrans during last exchange XN<dbd-retrans>X0
+    Index 1/1, retransmission queue length XNX0, number of retransmission XNX0
+    First 0(0)/0(0) Next 0(0)/0(0)
+    Last retransmission scan length is XNX0, maximum is XNX0
+    Last retransmission scan time is XNX0 msec, maximum is XNX0 msec
+    LS Ack list: NSR-sync pending XNX0, high water mark XNX0
+
+SHOWCMD: show route
+PREFIX: ospf-route
+ACTUAL:
+
+Topology Table for ospf 1 with ID 192.168.0.1
+
+Codes: O - Intra area, O IA - Inter area
+       O E1 - External type 1, O E2 - External type 2
+       O N1 - NSSA external type 1, O N2 - NSSA external type 2
+
+O    10.10.10.0/24, metric 1
+       10.10.10.1, directly connected, via GigabitEthernet0/0/0/0
+O IA 11.11.11.0/24, metric 2
+       10.10.10.2, from 192.168.0.2, via GigabitEthernet0/0/0/0
+
+MARKUP:
+
+Topology Table for ospf XW<process-id>X1 with ID XA<router-id>X192.168.0.1
+
+Codes: O - Intra area, O IA - Inter area
+       O E1 - External type 1, O E2 - External type 2
+       O N1 - NSSA external type 1, O N2 - NSSA external type 2
+
+XXX<(?:O   |O IA|O E1|O E2|O N1| O N2)><type>XXXO IA XPX11.11.11.0/24, metric XNX2
+       XAX10.10.10.2, XXX<(?:directly connected|from [\d+\.]+)><from>XXXfrom 192.168.0.2, via XIXGigabitEthernet0/0/0/0
+
+
+OS: NXOS
+
+SHOWCMD: show ip ospf interface
+PREFIX: ospf-intf
+
+ACTUAL:
+
+GigabitEthernet0/2/0/0 is up, line protocol is up
+  Internet Address 11.11.11.2/24, Area 1
+  Process ID 1, Router ID 192.168.0.2, Network Type BROADCAST, Cost: 1
+  Transmit Delay is 1 sec, State BDR, Priority 1, MTU 1500, MaxPktSz 1500
+  Designated Router (ID) 192.168.0.3, Interface address 11.11.11.3
+  Backup Designated router (ID) 192.168.0.2, Interface address 11.11.11.2
+  Timer intervals configured, Hello 10, Dead 40, Wait 40, Retransmit 5
+    Hello due in 00:00:03
+  Index 1/2, flood queue length 0
+  Next 0(0)/0(0)
+  Last flood scan length is 1, maximum is 1
+  Last flood scan time is 0 msec, maximum is 0 msec
+  LS Ack List: current length 0, high water mark 3
+  Neighbor Count is 1, Adjacent neighbor count is 1
+    Adjacent with neighbor 192.168.0.3  (Designated Router)
+  Suppress hello for 0 neighbor(s)
+  Multi-area interface Count is 0
+
+MARKUP:
+
+XIXGigabitEthernet0/2/0/0 is XWXup, line protocol is XWXup
+  Internet Address XPX11.11.11.2/24, Area XW<area>X1
+  Process ID XWX1, Router ID XAX192.168.0.2, Network Type XWXBROADCAST, Cost: XNX1
+  Transmit Delay is XNX1 sec, State XWXBDR, Priority XNX1, MTU XNX1500, MaxPktSz XNX1500
+  Designated Router (ID) XA<dr>X192.168.0.3, Interface address XA<dr_addr>X11.11.11.3
+  Backup Designated router (ID) XA<bdr>X192.168.0.2, Interface address XA<bdr_addr>X11.11.11.2
+  Timer intervals configured, Hello XNX<hello_int>10, Dead XN<dead_int>X40, Wait XN<wait_int>X40, Retransmit XN<retransmit_int>X5
+    Hello due in XT<hello_due>X00:00:03
+  Index 1/2, flood queue length XNX0
+  Next 0(0)/0(0)
+  Last flood scan length is XNX1, maximum is XNX1
+  Last flood scan time is XNX0 msec, maximum is XNX0 msec
+  LS Ack List: current length XNX0, high water mark XNX3
+  Neighbor Count is XNX1, Adjacent neighbor count is XNX1
+    Adjacent with neighbor 192.168.0.3  (Designated Router)
+  Suppress hello for XNX0 neighbor(s)
+  Multi-area interface Count is XNX0
+

@@ -1,0 +1,12 @@
+#!/usr/bin/python
+
+from tempest.thirdparty.cir.lib.device.LogInspector import LogInspector
+
+log_inspector = LogInspector()
+
+log_inspector.record_errors('mid-test')
+log_inspector.record_errors('end-test')
+log_inspector.show_log_errors()
+log_inspector.compare_logs('baseline', 'end-test')
+
+

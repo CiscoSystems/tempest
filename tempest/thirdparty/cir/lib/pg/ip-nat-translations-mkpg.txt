@@ -1,0 +1,48 @@
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# April 2015,     R.A. Winters <riwinter@cisco.com>
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: IOS
+
+CMD: SHOW_IP_NAT_TRANSLATIONS
+SHOWCMD:  show ip nat translations
+PREFIX: nat-translations
+
+ACTUAL:
+G10-ASR1001X-2#show ip nat translations
+Pro  Inside global         Inside local          Outside local         Outside global
+---  172.24.4.147          10.100.0.38           ---                   ---
+Total number of translations: 9
+
+
+MARKUP:
+#show ip nat translations
+Pro  Inside global         Inside local          Outside local         Outside global
+XS<protocol>X---  XS<inside-global>X172.24.4.147          XS<inside-local>X10.100.0.38           XS<outside-local>X---                   XS<outside-global>X---
+XXX<Total><total-key>XXXTotal number of translations: XN<total>X9

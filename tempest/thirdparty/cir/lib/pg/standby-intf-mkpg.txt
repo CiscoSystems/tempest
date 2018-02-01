@@ -1,0 +1,71 @@
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# September 2015,     R.A. Winters <riwinter@cisco.com>
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: IOS
+
+CMD: SHOW_STANDBY_INTERFACE
+SHOWCMD: show standby
+PREFIX: standby-intf
+
+ACTUAL:
+
+#show standby
+TenGigabitEthernet0/1/0.2502 - Group 1064 (version 2)
+  State is Standby
+    1 state change, last state change 00:30:59
+  Virtual IP address is 10.100.0.1
+  Active virtual MAC address is 0000.0c9f.f428 (MAC Not In Use)
+    Local virtual MAC address is 0000.0c9f.f428 (v2 default)
+  Hello time 1 sec, hold time 3 sec
+    Next hello sent in 0.368 secs
+  Preemption disabled
+  Active router is 10.100.0.3, priority 1 (expires in 3.216 sec)
+    MAC address is 78ba.f9a4.6710
+  Standby router is local
+  Priority 0 (configured 0)
+  Group name is "hsrp-Te0/1/0.250-1064-2" (default)
+
+
+MARKUP:
+#show standby
+XI<intf>XTenGigabitEthernet0/1/0.2502 - Group XN<group>X1064 (version XN<version>X2)
+  State is XW<state>XStandby
+    XN<state-change>X1 state change, last state change XT<last-change>X00:30:59
+  Virtual IP address is XA<vaddr>X10.100.0.1
+  Active virtual MAC address is XM<active-vmac>X0000.0c9f.f428 XXX<.*>XXX(MAC Not In Use)
+    Local virtual MAC address is XM<localc-mac>X0000.0c9f.f428 XXX<.*>XXX(v2 default)
+  Hello time XN<hello-time>X1 sec, hold time XN<hold-time>X3 sec
+    Next hello sent in 0.368 secs
+  Preemption XW<preemption>Xdisabled
+  Active router is XA<active-rtr-ip>X10.100.0.3, priority XN<active-rtr-priority>X1 XXX<.*>XXX(expires in 3.216 sec)
+    MAC address is XM<active-rtr-mac>X78ba.f9a4.6710
+  Standby router is XS<standby-rtr>Xlocal
+  Priority XN<priority>X0 (configured XN<configured-priority>X0)
+  Group name is "XXX<[^\"].+><group-name>XXXhsrp-Te0/1/0.250-1064-2" (default)

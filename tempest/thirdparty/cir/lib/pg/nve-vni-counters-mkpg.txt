@@ -1,0 +1,60 @@
+OS: NXOS
+
+#
+# June, 8 2015
+#
+#
+# Copyright (c) 2015 by cisco Systems, Inc.
+# All rights reserved.
+#
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+
+CMD: SHOW_NVE_VNI_COUNTERS
+SHOWCMD: show nve vni {} counters
+PREFIX: vni-counters
+ACTUAL:
+
+# show nve vni 9003 counters
+VNI: 9003
+TX
+        0 unicast packets 0 unicast bytes
+        0 multicast packets 0 multicast bytes
+RX
+        0 unicast packets 0 unicast bytes
+        0 multicast packets 0 multicast bytes
+
+
+MARKUP:
+
+# show nve vni 9003 counters
+VNI: XN<vni>X9003
+XXX<TX><tx>XXXTX
+        XN<tx-unicast-pkts>X0 unicast packets XN<tx-unicast-bytes>X0 unicast bytes
+        XN<tx-multicast-pkts>X0 multicast packets XN<tx-multicast-bytes>X0 multicast bytes
+XXX<RX><rx>XXXRX
+        XN<rx-unicast-pkts>X0 unicast packets XN<rx-unicast-bytes>X0 unicast bytes
+        XN<rx-multicast-pkts>X0 multicast packets XN<rx-multicast-bytes>X0 multicast bytes

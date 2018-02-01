@@ -1,0 +1,59 @@
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# April 2015,     R.A. Winters <riwinter@cisco.com>
+
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: NXOS
+
+CMD: SHOW_VLAN
+SHOWCMD: show vlan brief | no-more
+PREFIX: vlan
+
+ACTUAL:
+
+# show vlan
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+102  q-102                            active    Eth1/1/1, Eth1/1/2
+103  q-103                            active    Eth1/1/1, Eth1/1/2
+104  q-104                            active    Eth1/1/1, Eth1/1/2
+105  q-105                            active    Eth1/1/1, Eth1/1/2
+
+
+MARKUP:
+# show vlan
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+XN<id>X102    XXX<[a-zA-Z0-9]+[-]\d+><name>XXXq-102                   XW<status>Xactive XXX<(([^,]+),*)+><ports>XXXEth1/1/4, Eth1/2/1, Eth1/2/2
+103  q-103                            active    Eth1/1/1, Eth1/1/2
+104  q-104                            active    Eth1/1/1, Eth1/1/2
+105  q-105                            active    Eth1/1/1, Eth1/1/2
+

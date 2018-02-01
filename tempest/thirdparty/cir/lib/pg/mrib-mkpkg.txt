@@ -1,0 +1,64 @@
+#
+# May 11 2011, Christian E. Hopps
+#
+# Copyright (c) 2013 by cisco Systems, Inc.
+# All rights reserved.
+
+# See http://wwwin-eng.cisco.com/Eng/OIBU/WWW/XRUT/xrut-doc/scripts/mkpg.html
+# For description of format
+
+OS: IOX
+
+CMD: SHOW_MRIB_ROUTE
+SHOWCMD: show mrib route
+PREFIX: mrib-route
+
+ACTUAL:
+
+(*,224.0.1.39) Flags: S P
+  Up: 00:07:16
+
+(192.168.0.1,224.0.1.39) RPF nbr: 192.168.0.1 Flags:
+  Up: 00:07:16
+  Incoming Interface List
+    Loopback0 Flags: F A, Up: 00:07:16
+  Outgoing Interface List
+    Loopback0 Flags: F A, Up: 00:07:16
+    GigabitEthernet0/2/0/0 Flags: F, Up: 00:07:16
+    GigabitEthernet0/2/0/2 Flags: F, Up: 00:07:16
+
+(*,224.0.1.40) Flags: S P
+  Up: 00:07:16
+  Outgoing Interface List
+    Loopback0 Flags: II LI, Up: 00:07:16
+    GigabitEthernet0/2/0/0 Flags: II LI, Up: 00:06:15
+
+MARKUP:
+
+(XP<source>X192.168.0.1,XP<group>X224.0.1.39) RPF nbr: Xa<rpf>X192.168.0.1 Flags:XR<flags>XS P
+  Up: XT<uptime>X00:07:16
+  Incoming Interface List
+    XI<ingress-intf>XLoopback0 Flags: XC<ingress-flags>XF A, Up: XT<ingress-uptime>X00:07:16
+  Outgoing Interface List
+    XI<egress-intf>XLoopback0 Flags: XC<egress-flags>XF A, Up: XT<egress-uptime>00:07:16
+
+OS: NXOS
+
+CMD: SHOW_MRIB_ROUTE
+SHOWCMD: show ip mroute
+PREFIX: mrib-route
+ACTUAL:
+
+(13.13.13.4/32, 232.0.0.1/32), uptime: 00:00:43, igmp pim ip
+  Incoming interface: Ethernet2/1, RPF nbr: 11.11.11.2^M
+  Outgoing interface list: (count: 1)^M
+    Ethernet2/2, uptime: 00:00:43, igmp^M
+
+MARKUP:
+(XP<source>X13.13.13.4/32, XP<group>X232.0.0.1/32)
+(Xp<source>X13.13.13.4/32, Xp<group>X232.0.0.1/32), uptime: XT<uptime>X00:00:43
+(Xp<source>X13.13.13.4/32, Xp<group>X232.0.0.1/32), uptime: Xt<uptime>X00:00:43, XR<protos>Xigmp pim ip
+  Incoming interface: XI<ingress-intf>XEthernet2/1, RPF nbr: Xa<rpf>X11.11.11.2
+  Outgoing interface list: (count: XN<egress-count>X1)
+    XI<egress-intf>XEthernet2/2, uptime: XT<egress-uptime>X00:00:43, XR<egress-protos>Xigmp
+

@@ -1,0 +1,64 @@
+# Copyright (c) 2015 by Cisco Systems, Inc.
+# All rights reserved.
+#
+# Dec 2015,     R.A. Winters <riwinter@cisco.com>
+
+# XxX.... or
+# Xx<desc>X....
+#
+# desc is the string to label the match in the table
+# x is literal and x is one of:
+#
+# A - address (ipv4 or ipv6)
+# I - interface name
+# F - floating point number
+# H - hex number
+# M - mac address
+# N - number
+# R - newline requires
+# P - prefix address (ipv4 or ipv6)
+# p - parenthesis - match value inside parens
+# S - non-space
+# T - time (00:0:00)
+# W - word
+#
+# or XXX<regex>XXX... or
+# or XXX<regex><desc>XXX...
+#
+# regex is a regular expression
+# desc is the string to label the match in the table
+
+OS: IOS
+
+CMD: SHOW_IP_SUB_INTERFACE
+SHOWCMD:  show ip interface {}
+PREFIX: sub-intf
+
+
+
+ACTUAL:
+
+#show interfaces Te0/1/0.1540
+TenGigabitEthernet0/1/0.1540 is up, line protocol is up
+  Hardware is SPA-1X10GE-L-V2, address is e865.496f.5910 (bia e865.496f.5910)
+  Description: OPENSTACK_NEUTRON_INTF
+  Internet address is 10.100.0.67/28
+  MTU 1500 bytes, BW 10000000 Kbit/sec, DLY 10 usec,
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation 802.1Q Virtual LAN, Vlan ID  1540.
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Keepalive not supported
+  Last clearing of "show interface" counters never
+
+MARKUP:
+#show interfaces Te0/1/0.1540
+XI<name>XTenGigabitEthernet0/1/0.1540 is XW<state>Xup, line protocol is XW<line-state>Xup
+  Hardware is XI<hardware>XSPA-1X10GE-L-V2, address is XM<mac>Xe865.496f.5910 (bia XM<bia>Xe865.496f.5910)
+  Description: XW<description>XOPENSTACK_NEUTRON_INTF
+  Internet address is XA<address>X10.100.0.67/XN<mask>X28
+  MTU XN<mtu>X1500 bytes, BW XN<bw>X10000000 XXX<[^,]+><speed>XXXKbit/sec, DLY XN<delay>X10 XW<delay-units>Xusec,
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation XXX<[^,]+><encaps>XXX802.1Q Virtual LAN, Vlan ID  XN<vlan-id>X1540.
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Keepalive not supported
+  Last clearing of "show interface" counters never
