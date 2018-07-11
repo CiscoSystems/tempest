@@ -18,7 +18,8 @@ import tempest.thirdparty.cir.lib.pg.standby_delay as standby_delay
 import tempest.thirdparty.cir.lib.pg.standby_intf as standby_intf
 import tempest.thirdparty.cir.lib.pg.standby_nbrs as standby_nbrs
 import tempest.thirdparty.cir.lib.pg.standby_redirects as standby_redirects
-import tempest.thirdparty.cir.lib.pg.standby_brief as standby_brief
+#import tempest.thirdparty.cir.lib.pg.standby_brief as standby_brief
+import tempest.thirdparty.cir.lib.pg.standby_brief_multiline as standby_brief
 import tempest.thirdparty.cir.lib.pg.ip_nat_pool as ip_nat_pool
 import tempest.thirdparty.cir.lib.pg.ip_access_list as ip_access_list
 import tempest.thirdparty.cir.lib.pg.ip_route_vrf as ip_route_vrf
@@ -55,30 +56,30 @@ class ASR:
         self.external_intf = external_intf
         self.external_intf_sh = external_intf
         if self.external_intf.startswith("TenGigabitEthernet"):
-            self.external_intf_sh = \
-                self.external_intf.replace("TenGigabitEthernet", "Te")
+            self.external_intf_sh = self.external_intf.replace(
+                "TenGigabitEthernet", "Te")
 
         if self.external_intf.startswith("GigabitEthernet"):
-            self.external_intf_sh = \
-                self.external_intf.replace("GigabitEthernet", "Ge")
+            self.external_intf_sh = self.external_intf.replace(
+                "GigabitEthernet", "Gi")
 
         if self.external_intf.startswith("Port-channel"):
-            self.external_intf_sh = \
-                self.external_intf.replace("Port-channel", "Po")
+            self.external_intf_sh = self.external_intf.replace("Port-channel",
+                                                               "Po")
 
         self.internal_intf = internal_intf
         self.internal_intf = internal_intf
         if self.internal_intf.startswith("TenGigabitEthernet"):
-            self.internal_intf_sh = \
-                self.internal_intf.replace("TenGigabitEthernet", "Te")
+            self.internal_intf_sh = self.internal_intf.replace(
+                "TenGigabitEthernet", "Te")
 
         if self.internal_intf.startswith("GigabitEthernet"):
-            self.internal_intf_sh = \
-                self.internal_intf.replace("GigabitEthernet", "Ge")
+            self.internal_intf_sh = self.internal_intf.replace(
+                "GigabitEthernet", "Gi")
 
         if self.internal_intf.startswith("Port-channel"):
-            self.internal_intf_sh = \
-                self.internal_intf.replace("Port-channel", "Po")
+            self.internal_intf_sh = self.internal_intf.replace("Port-channel",
+                                                               "Po")
 
         self.conn = None
         self.console = None
@@ -99,8 +100,8 @@ class ASR:
             return self.conn.is_connected()
         return False
 
-    def execute(self, cmd, timeout=None, prompt=None,
-                searchwindowsize=None, verify=1):
+    def execute(self, cmd, timeout=None, prompt=None, searchwindowsize=None,
+                verify=1):
         if self.conn is None:
             self.connect()
 
@@ -142,7 +143,7 @@ class ASR:
 
     # Execute a command via the console connection
     def console_execute(self, cmd, timeout=None, prompt=None,
-                searchwindowsize=None, verify=1):
+                        searchwindowsize=None, verify=1):
         if self.console is None:
             self.ts_console()
 
@@ -196,7 +197,7 @@ class ASR:
             r'.*System configuration has been modified.+Save.+yes/no.*')
         if save_re.match(last_line):
             try:
-                resp = self.send_command("no\n\n")
+                self.send_command("no\n\n")
             except Exception:
                 pass
 
@@ -305,20 +306,22 @@ class ASR:
         timeout = current_time + max_time
         while current_time < timeout:
             attr_values = [('nat-translations.total-key', 'Total'), ]
-            pg_nt = pg.oper_fill(self.conn,
-                                 "SHOW_IP_NAT_TRANSLATIONS",
-                                 attr_values,
-                                 refresh_cache=True,
-                                 regex_tag_fill_pattern=
-                                 '^nat-translations.total*')
+            pg_nt = pg.oper_fill(
+                self.conn,
+                "SHOW_IP_NAT_TRANSLATIONS",
+                attr_values,
+                refresh_cache=True,
+                regex_tag_fill_pattern='^nat-translations.total*')
+            ## Sridar debug
+#            import pdb; pdb.set_trace()
             asr_nats = {}
             if pg_nt.parse():
                 result = pg.ext_dictio
                 if self.conn.name in result:
                     asr_nats = result[self.conn.name]
                 else:
-                    msg = "{0} Failed to parse netconf " \
-                              "counters".format(self.conn.name)
+                    msg = "{0} Failed to parse netconf counters".format(
+                        self.conn.name)
                     raise asr_exceptions.ShowOutputParserException(msg)
 
             total_nats = asr_nats['nat-translations.total']
@@ -338,14 +341,12 @@ class ASR:
             vrf_name += "-{0}".format(region_id)
 
         LOG.info("VRF Name = {0}".format(vrf_name))
+        time.sleep(60)
         res = pg.oper_fill_tabular(device=self.conn,
-                                   show_command=
-                                   "show vrf {0}".format(vrf_name),
-                                   header_fields =
-                                   ["Name",
-                                    "Default RD",
-                                    "Protocols",
-                                    "Interfaces"])
+                                   show_command="show vrf {0}".format(
+                                       vrf_name),
+                                   header_fields=["Name", "Default RD",
+                                                  "Protocols", "Interfaces"])
         LOG.info("VRF Entries: {0}".format(res))
         entries = res.entries
         if vrf_name not in entries:
@@ -354,12 +355,12 @@ class ASR:
 
     def get_netconf_counters(self):
         attr_values = [('netconf-counters.transactions', 'Transactions'), ]
-        pg_nc = pg.oper_fill(self.conn,
-                             "SHOW_NETCONF_COUNTERS",
-                             attr_values,
-                             refresh_cache=True,
-                             regex_tag_fill_pattern=
-                             '^netconf-counters.transaction*')
+        pg_nc = pg.oper_fill(
+            self.conn,
+            "SHOW_NETCONF_COUNTERS",
+            attr_values,
+            refresh_cache=True,
+            regex_tag_fill_pattern='^netconf-counters.transaction*')
 
         netconf_counters = {}
         if pg_nc.parse():
@@ -367,8 +368,8 @@ class ASR:
             if self.conn.name in result:
                 netconf_counters = result[self.conn.name]
             else:
-                msg = "{0} Failed to parse netconf " \
-                      "counters".format(self.conn.name)
+                msg = "{0} Failed to parse netconf counters".format(
+                    self.conn.name)
                 raise asr_exceptions.ShowOutputParserException(msg)
         return netconf_counters
 
@@ -378,12 +379,12 @@ class ASR:
         timeout = current_time + max_time
         while current_time < timeout:
             attr_values = [('netconf-counters.transactions', 'Transactions'), ]
-            pg_nc = pg.oper_fill(self.conn,
-                                 "SHOW_NETCONF_COUNTERS",
-                                 attr_values,
-                                 refresh_cache=True,
-                                 regex_tag_fill_pattern=
-                                 '^netconf-counters.transaction*')
+            pg_nc = pg.oper_fill(
+                self.conn,
+                "SHOW_NETCONF_COUNTERS",
+                attr_values,
+                refresh_cache=True,
+                regex_tag_fill_pattern='^netconf-counters.transaction*')
 
             netconf_counters = {}
             if pg_nc.parse():
@@ -391,8 +392,8 @@ class ASR:
                 if self.conn.name in result:
                     netconf_counters = result[self.conn.name]
                 else:
-                    msg = "{0} Failed to parse netconf " \
-                          "counters".format(self.conn.name)
+                    msg = "{0} Failed to parse netconf counters".format(
+                        self.conn.name)
                     raise asr_exceptions.ShowOutputParserException(msg)
 
             if int(netconf_counters['netconf-counters.transactions-total'])\
@@ -402,8 +403,8 @@ class ASR:
             time.sleep(sleep_for)
             current_time = time.time()
 
-        msg = "Timeout waiting for netconf transactions on " \
-              "ASR {0}".format(self.name)
+        msg = "Timeout waiting for netconf transactions on ASR {0}".format(
+            self.name)
         raise asr_exceptions.ASRTimeoutException(msg)
 
 
@@ -421,15 +422,16 @@ class VerifyASRStandby:
         for fip_tuple in floating_ips:
             target_ip, server = fip_tuple
 
-            global_ip = target_ip.floating_ip_address
-            local_ip = target_ip.fixed_ip_address
+            global_ip = target_ip['floating_ip_address']
+            local_ip = target_ip['fixed_ip_address']
             for asr in [self.active, self.standby]:
                 attr_values = [('nat-translations.inside-global', global_ip), ]
-                pg_nt = pg.oper_fill(asr, "SHOW_IP_NAT_TRANSLATIONS",
-                                     attr_values,
-                                     refresh_cache=True,
-                                     regex_tag_fill_pattern=
-                                     '^nat-translations.inside*')
+                pg_nt = pg.oper_fill(
+                    asr,
+                    "SHOW_IP_NAT_TRANSLATIONS",
+                    attr_values,
+                    refresh_cache=True,
+                    regex_tag_fill_pattern='^nat-translations.inside*')
 
                 asr_nats = {}
                 if pg_nt.parse():
@@ -437,22 +439,20 @@ class VerifyASRStandby:
                     if asr.name in result:
                         asr_nats = result[asr.name]
                     else:
-                        msg = "{0} Failed to parse IP NAT Translations " \
-                              "counters".format(asr.name)
+                        msg = ("{0} Failed to parse IP NAT Translations "
+                               "counters").format(asr.name)
                         raise asr_exceptions.ShowOutputParserException(msg)
 
                 if 'nat-translations.inside-local' not in asr_nats:
-                    msg = "No inside local address found for " \
-                          "{0}".format(global_ip)
+                    msg = "No inside local address found for {0}".format(
+                        global_ip)
                     raise asr_exceptions.NATNotFoundException(msg)
 
                 if local_ip != asr_nats['nat-translations.inside-local']:
                     key = 'nat-translations.inside-local'
-                    msg = "NAT Mapping for {0} is incorrect:\n" \
-                          "\tExpected:\t{1}\n" \
-                          "\tActual:\t{2}".format(global_ip,
-                                                  local_ip,
-                                                  asr_nats[key])
+                    msg = ("NAT Mapping for {0} is incorrect:\n "
+                           "\tExpected:\t{1}\n \tActual:\t{2}").format(
+                        global_ip, local_ip, asr_nats[key])
                     raise asr_exceptions.IncorrectNATMappingException(msg)
 
     def eot_cfg_sizes(self):
@@ -481,20 +481,19 @@ class VerifyASRStandby:
             return
 
         if active_cfg_sizes['test-end'] != standby_cfg_sizes['test-end']:
-            msg = "Active{0} vs Standby{1} ASR Cfg size " \
-                  "mismatch".format(active_cfg_sizes['test-end'],
-                                    standby_cfg_sizes['test-end'])
+            msg = "Active{0} vs Standby{1} ASR Cfg size mismatch".format(
+                active_cfg_sizes['test-end'], standby_cfg_sizes['test-end'])
             raise asr_exceptions.ConfigSizeException(msg)
 
     def netconf_counters(self):
         for asr in [self.active, self.standby]:
             attr_values = [('netconf-counters.transactions', 'Transactions'), ]
-            pg_nc = pg.oper_fill(asr,
-                                 "SHOW_NETCONF_COUNTERS",
-                                 attr_values,
-                                 refresh_cache=True,
-                                 regex_tag_fill_pattern=
-                                 '^netconf-counters.transaction*')
+            pg_nc = pg.oper_fill(
+                asr,
+                "SHOW_NETCONF_COUNTERS",
+                attr_values,
+                refresh_cache=True,
+                regex_tag_fill_pattern='^netconf-counters.transaction*')
 
             netconf_transactions = {}
             if pg_nc.parse():
@@ -502,15 +501,18 @@ class VerifyASRStandby:
                 if asr.name in result:
                     netconf_transactions = result[asr.name]
                 else:
-                    msg = "{0} Failed to parse netconf " \
-                          "counters".format(asr.name)
+                    msg = "{0} Failed to parse netconf counters".format(
+                        asr.name)
                     raise asr_exceptions.ShowOutputParserException(msg)
 
             error_key = 'netconf-counters.transaction-errors'
             if int(netconf_transactions[error_key]) != 0:
                 msg = "ASR {0} is reporting netconf errors: {1}".format(
                     asr.name, netconf_transactions[error_key])
-                raise asr_exceptions.NetconfErrorException(msg)
+                # NOTE(bobmel): Too limited error output to act on so just log
+                LOG.warn(msg)
+                # TODO(sridar): check if netconf counters can be ignored.
+                #raise asr_exceptions.NetconfErrorException(msg)
 
     def swap_asrs(self):
         tmp_asr = self.active
@@ -528,14 +530,14 @@ class VerifyASRStandby:
                                  attr_values,
                                  refresh_cache=True,
                                  regex_tag_fill_pattern='^standby-brief\..*')
-
+#            pdb.set_trace()
             if pg_sb.parse():
                 result = pg.ext_dictio
                 if self.active.name in result:
                     active_data = result[self.active.name]
                 else:
-                    msg = "{0} Failed to parse show standby " \
-                          "brief output".format(self.active.name)
+                    msg = ("{0} Failed to parse show standby brief "
+                           "output").format(self.active.name)
                     raise asr_exceptions.ShowOutputParserException(msg)
 
             if 'standby-brief.state' in active_data:
@@ -548,7 +550,8 @@ class VerifyASRStandby:
             self.active = self.standby
             self.standby = tmp_active
 
-    def standby_state(self, segment_ids, switch_asr=False, switch_hsrp_priority=False):
+    def standby_state(self, segment_ids, switch_asr=False,
+                      switch_hsrp_priority=False):
         if switch_asr is True:
             tmp_asr = self.active
             self.active = self.standby
@@ -568,8 +571,8 @@ class VerifyASRStandby:
                 if self.active.name in result:
                     active_data = result[self.active.name]
                 else:
-                    msg = "{0} Failed to parse show standby " \
-                          "brief output".format(self.active.name)
+                    msg = ("{0} Failed to parse show standby brief "
+                           "output").format(self.active.name)
                     raise asr_exceptions.ShowOutputParserException(msg)
 
             intf = self.standby.internal_intf_sh + "." + str(id)
@@ -585,24 +588,24 @@ class VerifyASRStandby:
                 if self.standby.name in result:
                     standby_data = result[self.standby.name]
                 else:
-                    msg = "{0} Failed to parse show standby " \
-                          "brief output".format(self.standby.name)
+                    msg = ("{0} Failed to parse show standby brief "
+                           "output").format(self.standby.name)
                     raise asr_exceptions.ShowOutputParserException(msg)
 
             if (int(active_data['standby-brief.group']) !=
                     int(standby_data['standby-brief.group'])):
                 msg = ("Active group {0}, Standby group {1}, interface "
-                       "{2}".format(active_data['standby-brief.group'],
-                                    standby_data['standby-brief.group']))
+                       "{2}").format(active_data['standby-brief.group'],
+                                     standby_data['standby-brief.group'])
                 raise asr_exceptions.StandbyGroupMismatchException(msg)
 
             if int(active_data['standby-brief.priority']) < \
                     int(standby_data['standby-brief.priority']):
                 msg = ("Active ASR Priority {0} is smaller than "
-                       "Standby ASR priority {1} for interface {2}".format(
+                       "Standby ASR priority {1} for interface {2}").format(
                         active_data['standby-brief.priority'],
                         standby_data['standby-brief.priority'],
-                        intf))
+                        intf)
                 raise asr_exceptions.StandbyPriorityException(msg)
 
             if switch_asr is True or switch_hsrp_priority is True:
@@ -610,32 +613,36 @@ class VerifyASRStandby:
                     msg = ("Active ASR {0} standby state is incorrect for "
                            "interface {1}\n"
                            "\tExpected:\tStandby\n"
-                           "\tActual:\t\t{2}".format(self.active.name, intf,
-                                            active_data['standby-brief.state']))
+                           "\tActual:\t\t{2}").format(
+                        self.active.name, intf,
+                        active_data['standby-brief.state'])
                     raise asr_exceptions.StandbyStateException(msg)
 
                 if standby_data['standby-brief.state'] != 'Active':
                     msg = ("Standby ASR {0} standby state is incorrect for "
                            "interface {1}\n"
                            "\tExpected:\tActive\n"
-                           "\tActual:\t{2}".format(self.standby.name, intf,
-                                            standby_data['standby-brief.state']))
+                           "\tActual:\t{2}").format(
+                        self.standby.name, intf,
+                        standby_data['standby-brief.state'])
                     raise asr_exceptions.StandbyStateException(msg)
             else:
                 if active_data['standby-brief.state'] != 'Active':
                     msg = ("Active ASR {0} standby state is incorrect for "
                            "interface {1}\n"
                            "\tExpected:\tActive\n"
-                           "\tActual:\t\t{2}".format(self.active.name, intf,
-                                            active_data['standby-brief.state']))
+                           "\tActual:\t\t{2}").format(
+                        self.active.name, intf,
+                        active_data['standby-brief.state'])
                     raise asr_exceptions.StandbyStateException(msg)
 
                 if standby_data['standby-brief.state'] != 'Standby':
                     msg = ("Standby ASR {0} standby state is incorrect for "
                            "interface {1}\n"
                            "\tExpected:\tStandby\n"
-                           "\tActual:\t{2}".format(self.standby.name, intf,
-                                            standby_data['standby-brief.state']))
+                           "\tActual:\t{2}").format(
+                        self.standby.name, intf,
+                        standby_data['standby-brief.state'])
                     raise asr_exceptions.StandbyStateException(msg)
 
             if (active_data['standby-brief.virtual-ip'] !=
@@ -643,13 +650,13 @@ class VerifyASRStandby:
                 msg = ("Virtual IP mismatch between Active/Standby ASR for "
                        "interface {0}\n"
                        "Active virtual IP:\t{1}\n"
-                       "Standby virtual IP:\t{2}".
-                       format(intf,
-                              active_data['standby-brief.virtual-ip'],
-                              standby_data['standby-brief.virtual-ip']))
+                       "Standby virtual IP:\t{2}").format(
+                    intf, active_data['standby-brief.virtual-ip'],
+                    standby_data['standby-brief.virtual-ip'])
                 raise asr_exceptions.StandbyVirtualIpException(msg)
 
     def vrf(self, rtr, rtr_state, region_id=None):
+        #pdb.set_trace()
         if rtr_state == 'ACTIVE':
             self.active.verify_vrf(rtr, region_id=region_id)
         if rtr_state == 'STANDBY':
@@ -675,12 +682,12 @@ class VerifyASRStandby:
                 break
 
         if num_routers != 2:
-            msg = "Not enough routers found for tenant-id " \
-                  "{0}".format(tenant_id)
+            msg = "Not enough routers found for tenant-id {0}".format(
+                tenant_id)
             raise asr_exceptions.NoRedundantASRException(msg)
 
-    def get_rtrs(self, network_client, tenant_id):
-        router_list = network_client.list_routers()['routers']
+    def get_rtrs(self, routers_client, tenant_id):
+        router_list = routers_client.list_routers()['routers']
         rtrs = {}
         for rtr in router_list:
             if rtr['tenant_id'] == tenant_id:
@@ -697,12 +704,12 @@ class VerifyASRStandby:
 
         return rtrs
 
-    def get_backup_rtr(self, target_rtr, network_client, tenant_id):
-        router_list = network_client.list_routers()['routers']
+    def get_backup_rtr(self, target_rtr, routers_client, tenant_id):
+        router_list = routers_client.list_routers()['routers']
         rtrs = {}
         for rtr in router_list:
-            if rtr['tenant_id'] == tenant_id and \
-                            target_rtr['name']  == rtr['name']:
+            if (rtr['tenant_id'] == tenant_id and
+                    target_rtr['name'] == rtr['name']):
                 rtrs['primary'] = rtr
                 break
 
@@ -716,15 +723,14 @@ class VerifyASRStandby:
 
         return rtrs
 
-
     def get_vrf_name(self, rtr, region_id=None):
         vrf_name = "nrouter-" + rtr['id'][:6]
         if region_id:
             vrf_name += "-{0}".format(region_id)
         return vrf_name
 
-    def nat_pool(self, network_client, tenant_id, region_id=None):
-        routers = self.get_rtrs(network_client, tenant_id)
+    def nat_pool(self, routers_client, tenant_id, region_id=None):
+        routers = self.get_rtrs(routers_client, tenant_id)
         for router_type in ['primary', 'backup']:
             router = routers[router_type]
             vrf_name = self.get_vrf_name(router, region_id=region_id)
@@ -742,20 +748,20 @@ class VerifyASRStandby:
                 if asr.name in result:
                     nat_pool_data = result[asr.name]
                 else:
-                    msg = "{0} Failed to parse ip nat pool " \
-                          "name output".format(asr.name)
+                    msg = "{0} Failed to parse ip nat pool name output".format(
+                        asr.name)
                     raise asr_exceptions.ShowOutputParserException(msg)
 
             if 'nat-pool.pool-name' not in nat_pool_data or \
                             nat_pool_data['nat-pool.pool-name'] != pool_name:
-                msg = "NAT Pool {0} is not configured " \
-                      "on ASR {1}".format(pool_name, asr.name)
+                msg = "NAT Pool {0} is not configured on ASR {1}".format(
+                    pool_name, asr.name)
                 raise asr_exceptions.NATPoolNotConfiguredException(msg)
 
             LOG.info("NAT Pool data = {0}".format(nat_pool_data))
 
-    def get_subnets_for_tenant(self, network_client, tenant_id):
-        subnets = network_client.list_subnets()['subnets']
+    def get_subnets_for_tenant(self, client, tenant_id):
+        subnets = client.list_subnets()['subnets']
         tenant_subnets = []
         for subnet in subnets:
             if subnet['tenant_id'] == tenant_id:
@@ -773,27 +779,25 @@ class VerifyASRStandby:
             return "neutron_acl_{0}_{1}".format(segment_id, port_id)
         return "neutron_acl_{0}_{1}_{2}".format(region_id, segment_id, port_id)
 
-    def acls(self, network_client, networks_client, tenant_id,
+    def acls(self, subnets_client, ports_client, networks_client, tenant_id,
              segmentation_ids, region_id=None):
 
-        subnets = self.get_subnets_for_tenant(network_client, tenant_id)
+        subnets = self.get_subnets_for_tenant(subnets_client, tenant_id)
         for subnet in subnets:
             LOG.info("Subnet {0}".format(subnet))
             network = self.get_network(networks_client, subnet['network_id'])
-            port_list = \
-                network_client.list_ports(network_id=subnet['network_id'],
-                                          status='ACTIVE',
-                                          device_owner='network:router_interface')['ports']
+            port_list = ports_client.list_ports(
+                network_id=subnet['network_id'], status='ACTIVE',
+                device_owner='network:router_interface')['ports']
             port_ids = [port['id'] for port in port_list]
 
             segment_id = network['provider:segmentation_id']
             acl_names = [self.mk_acl_name(port_id[:8], segment_id, region_id)
                          for port_id in port_ids]
             if segment_id not in segmentation_ids:
-                msg = "Network {0} segment_id {1} not in segmentation_ids " \
-                      "{2} created for this test".format(network['id'],
-                                                         segment_id,
-                                                         segmentation_ids)
+                msg = ("Network {0} segment_id {1} not in segmentation_ids {2}"
+                       " created for this test").format(
+                    network['id'], segment_id, segmentation_ids)
                 raise asr_exceptions.ASRTestException(msg)
 
             cidr = subnet['cidr']
@@ -803,7 +807,8 @@ class VerifyASRStandby:
                 for acl_name in acl_names:
                     attr_values = [('acl.name', acl_name), ]
                     pg_acl = pg.oper_fill(asr,
-                                          "show access-lists {0}".format(acl_name),
+                                          "show access-lists {0}".format(
+                                              acl_name),
                                           attr_values,
                                           refresh_cache=True,
                                           regex_tag_fill_pattern='^acl\..*')
@@ -831,21 +836,20 @@ class VerifyASRStandby:
 
                 if 'acl.action' not in acl_data or \
                                 acl_data['acl.action'] != 'permit':
-                    msg = "ACL {0} action {1} is incorrect ".format(acl_name,
-                                                                    acl_data['acl.action'])
+                    msg = "ACL {0} action {1} is incorrect ".format(
+                        acl_name, acl_data['acl.action'])
                     raise asr_exceptions.ASRTestException(msg)
 
                 if 'acl.address' not in acl_data or \
                         not cidr.startswith(acl_data['acl.address']):
-                    msg = "ASL {0} address {1} does not match network " \
-                          "address {2}".format(acl_name,
-                                               acl_data['acl.address'],
-                                               cidr)
+                    msg = ("ASL {0} address {1} does not match network "
+                           "address {2}").format(
+                        acl_name, acl_data['acl.address'], cidr)
                     raise asr_exceptions.ASRTestException(msg)
 
-    def ext_subintf(self, network_client, networks_client,
+    def ext_subintf(self, subnets_client, routers_client, networks_client,
                     routers, tenant_id, region_id=None, switch_asr=False):
-        routers = self.get_rtrs(network_client, tenant_id)
+        routers = self.get_rtrs(routers_client, tenant_id)
         for router_type in ['primary', 'backup']:
             router = routers[router_type]
             vrf_name = self.get_vrf_name(router, region_id=region_id)
@@ -876,8 +880,8 @@ class VerifyASRStandby:
                 if asr.name in result:
                     vrf_route_data = result[asr.name]
                 else:
-                    msg = "{0} Failed to parse ip route vrf {0}" \
-                              "static on ASR {1}".format(vrf_name, asr.name)
+                    msg = ("{0} Failed to parse ip route vrf {0} static on "
+                          "ASR {1}").format(vrf_name, asr.name)
                     raise asr_exceptions.ShowOutputParserException(msg)
 
             LOG.info("VRF Route data {0}".format(vrf_route_data))
@@ -888,8 +892,9 @@ class VerifyASRStandby:
 
             attr_values = [('sub-intf.name',
                             vrf_route_data['vrf-route.interface'])]
-            pg_si = pg.oper_fill(asr, "show interface {0}".format(
-                vrf_route_data['vrf-route.interface']),
+            pg_si = pg.oper_fill(asr,
+                                 "show interface {0}".format(
+                                     vrf_route_data['vrf-route.interface']),
                                  attr_values,
                                  refresh_cache=True,
                                  regex_tag_fill_pattern='^sub-intf\..*')
@@ -899,32 +904,30 @@ class VerifyASRStandby:
                 if asr.name in result:
                     sub_intf_data = result[asr.name]
                 else:
-                    msg = "{0} Failed to parse interface {0}" \
-                              "static on ASR {1}".format(
-                        vrf_route_data['vrf-route.interface'], asr.name)
+                    msg = ("{0} Failed to parse interface {0} static on ASR "
+                           "{1}").format(vrf_route_data['vrf-route.interface'],
+                                         asr.name)
                     raise asr_exceptions.ShowOutputParserException(msg)
 
             subnet_id = ext_network['subnets'][0]
-            ext_subnet = network_client.show_subnet(subnet_id)['subnet']
+            ext_subnet = subnets_client.show_subnet(subnet_id)['subnet']
 
             sub_intf_desc = "OPENSTACK_NEUTRON_EXTERNAL_INTF"
             if region_id:
-                sub_intf_desc = \
-                    "OPENSTACK_NEUTRON_{0}_INTF".format(region_id)
+                sub_intf_desc = "OPENSTACK_NEUTRON_{0}_INTF".format(region_id)
 
             LOG.info("External sub-interface data: {0}".format(sub_intf_data))
             if 'sub-intf.description' not in sub_intf_data or \
                             sub_intf_data['sub-intf.description'] \
                             != sub_intf_desc:
-                msg = "Interface {0} is not the External interface for VRF " \
-                      "{1} on ASR {2}".format(vrf_route_data['vrf-route.interface'],
-                                              vrf_name,
-                                              asr.name)
+                msg = ("Interface {0} is not the External interface for VRF "
+                       "{1} on ASR {2}").format(
+                    vrf_route_data['vrf-route.interface'], vrf_name, asr.name)
                 raise asr_exceptions.ASRTestException(msg)
 
             if 'vrf-route.gateway' not in vrf_route_data or \
                             vrf_route_data['vrf-route.gateway'] != \
                             ext_subnet['gateway_ip']:
-                msg = "GW Address not set correctly on External " \
-                      "subinterface ASR {0}".format(asr.name)
+                msg = ("GW Address not set correctly on External "
+                       "subinterface ASR {0}").format(asr.name)
                 raise asr_exceptions.ASRTestException(msg)

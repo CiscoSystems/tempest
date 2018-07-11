@@ -702,8 +702,8 @@ ValidationGroup = [
                     '-fixed: uses the first IP belonging to the fixed network '
                     '-floating: creates and uses a floating IP'),
     cfg.StrOpt('auth_method',
-               default='keypair',
-               choices=['keypair'],
+               default='password',
+               choices=['keypair', 'password'],
                help='Default authentication method to the instance. '
                     'Only ssh via keypair is supported for now. '
                     'Additional methods will be handled in a separate spec.'),
@@ -724,7 +724,7 @@ ValidationGroup = [
                default="root",
                help="User name used to authenticate to an instance."),
     cfg.StrOpt('image_ssh_password',
-               default="password",
+               default="cubswin:)",
                help="Password used to authenticate to an instance."),
     cfg.StrOpt('ssh_shell_prologue',
                default="set -eu -o pipefail; PATH=$$PATH:/sbin;",

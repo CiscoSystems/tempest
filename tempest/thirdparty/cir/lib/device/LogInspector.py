@@ -61,41 +61,46 @@ class LogInspector:
         self.re_error_exception_list = []
         self.re_trace_exception_list = []
         self.log_error_re =\
-            re.compile(r'([\d-]+)\s+([0-9:\.]+)\sERROR.+')
+            re.compile(r'([\d-]+)\s+([0-9:\.]+)\s[\d]*\sERROR.+')
         self.log_traceback_re = \
-            re.compile(r'([\d-]+)\s+([0-9:\.]+)\sTRACE.+')
+            re.compile(r'([\d-]+)\s+([0-9:\.]+)\s[\d]*\sTRACE.+')
         # Expected Trace for connection failure when the ASR management interface is disabled
         # DE1164
         self.log_connect_trace_re = \
-            re.compile(r'([\d-]+)\s+([0-9:\.]+)\sTRACE.+plugins.cisco.cfg_agent'
+            re.compile(r'([\d-]+)\s+([0-9:\.]+)\s[\d]*\sTRACE.+plugins.cisco.cfg_agent'
                        r'.service_helpers.routing_svc_helper.+')
         self.re_trace_exception_list.append(self.log_connect_trace_re)
         # Expected error for ping failure when the ASR management interface is disabled
         self.log_ping_fail_re = \
-            re.compile(r'([\d-]+)\s+([0-9:\.]+)\sERROR.+agent.linux.utils.+')
+            re.compile(r'([\d-]+)\s+([0-9:\.]+)\s[\d]*\sERROR.+agent.linux.utils.+')
         self.re_error_exception_list.append(self.log_ping_fail_re)
 
         # Expected error for Rabbit MQ on container swo
         self.rabbit_conn_err = \
-            re.compile(r'([\d-]+)\s+([0-9:\.]+)\sERROR.+oslo.messaging._drivers.impl_rabbit.+AMQP.server.on.+is.unreachable.+Too.many.heartbeats.missed.*')
+            re.compile(r'([\d-]+)\s+([0-9:\.]+)\s[\d]*\sERROR.+oslo.messaging._drivers.impl_rabbit.+AMQP.server.on.+is.unreachable.+Too.many.heartbeats.missed.*')
         self.re_error_exception_list.append(self.rabbit_conn_err)
 
         # Expected error for connection failure when the ASR management interface is disabled
         # DE1164)
         self.log_connect_error_re = \
-            re.compile(r'([\d-]+)\s+([0-9:\.]+)\sERROR.+plugins.cisco.cfg_agent'
+            re.compile(r'([\d-]+)\s+([0-9:\.]+)\s[\d]*\sERROR.+plugins.cisco.cfg_agent'
                        r'.service_helpers.routing_svc_helper.+')
         self.re_error_exception_list.append(self.log_connect_error_re)
         # Expected error in DE1897
         self.log_dhcp_api_error_re = \
-            re.compile(r'([\d-]+)\s+([0-9:\.]+)\sERROR.+api.rpc.agentnotifiers.dhcp_rpc_agent_api.+')
+            re.compile(r'([\d-]+)\s+([0-9:\.]+)\s[\d]*\sERROR.+api.rpc.agentnotifiers.dhcp_rpc_agent_api.+')
         self.re_error_exception_list.append(self.log_dhcp_api_error_re)
 
-        self.ext_paths_dont_exist_error_re = re.compile(r'([\d-]+)\s+([0-9:\.]+)\sERROR.+neutron.api.extensions.+')
+        self.ext_paths_dont_exist_error_re = re.compile(r'([\d-]+)\s+([0-9:\.]+)\s[\d]*\sERROR.+neutron.api.extensions.+')
         self.re_error_exception_list.append(self.ext_paths_dont_exist_error_re)
 
+        # Sridar adding for Transaction Error
+        self.delete_port_in_transaction_error_re = \
+            re.compile(r'([\d-]+)\s+([0-9:\.]+)\s[\d]*\sERROR.+oslo_messaging.rpc.server.+')
+        self.re_error_exception_list.append(self.delete_port_in_transaction_error_re)
+
         self.state_report_start_re = \
-            re.compile(r'([\d-]+)\s+([0-9:\.]+)\sDEBUG.+plugins.cisco.cfg_agent.cfg_agent.+State report.+')
+            re.compile(r'([\d-]+)\s+([0-9:\.]+)\s[\d]*\sDEBUG.+plugins.cisco.cfg_agent.cfg_agent.+State report.+')
         self.state_report_end_re = re.compile(r'.+_report_state.+')
         self.state_report_re = re.compile(r'.+State report: ({.+}).+_report_state.+')
 
@@ -140,6 +145,8 @@ class LogInspector:
         log_file = self.log_dir + "/" + self.cfg_agent_log
 
         sr_flag = False
+        state_report = ""
+        sr_key = ""
         for line in open(log_file):
             line = self.ansi_escape.sub('', line)
             if self.state_report_start_re.match(line.rstrip('\r\n')):
@@ -173,6 +180,8 @@ class LogInspector:
         log_file = self.log_dir + "/" + log
         if os.path.isfile(log_file):
             log_content = [line.rstrip('\n') for line in open(log_file)]
+        else:
+            log_content = []
 
         current_error_id = 0
         current_tb_id = 0

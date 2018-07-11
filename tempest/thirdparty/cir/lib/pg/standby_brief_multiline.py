@@ -15,12 +15,13 @@ regex = {
         # SHOW_STANDBY_BRIEF ('show standby brief')
         #
         'standby-brief.intf'       : r'([-A-Za-z0-9\._/:]+)',
-        'standby-brief.group'      : r'\s+(\d+)\s+\d+\s+\w+\s+[A-Fa-o0-9:\.]+\s+[A-Fa-o0-9:\.]+\s+[A-Fa-f0-9:\.]+',
-        'standby-brief.priority'   : r'\s+\d+\s+(\d+)\s+\w+\s+[A-Fa-o0-9:\.]+\s+[A-Fa-o0-9:\.]+\s+[A-Fa-f0-9:\.]+',
-        'standby-brief.state'      : r'\s+\d+\s+\d+\s+(\w+)\s+[A-Fa-o0-9:\.]+\s+[A-Fa-o0-9:\.]+\s+[A-Fa-f0-9:\.]+',
-        'standby-brief.active'     : r'\s+\d+\s+\d+\s+\w+\s+([A-Fa-o0-9:\.]+)\s+[A-Fa-o0-9:\.]+\s+[A-Fa-f0-9:\.]+',
-        'standby-brief.standby'    : r'\s+\d+\s+\d+\s+\w+\s+[A-Fa-o0-9:\.]+\s+([A-Fa-o0-9:\.]+)\s+[A-Fa-f0-9:\.]+',
-        'standby-brief.virtual-ip' : r'\s+\d+\s+\d+\s+\w+\s+[A-Fa-o0-9:\.]+\s+[A-Fa-o0-9:\.]+\s+([A-Fa-f0-9:\.]+)',
+        'standby-brief.group'      : r'\s+(\d+)\s+\d+\s+\w+\s+[A-Fa-o0-9:\.]+\s+[A-Fa-z0-9:\.]+\s+[A-Fa-f0-9:\.]+',
+#       'standby-brief.group'      : r'\s+(\d+)\s+\d+\s+\w+\s+[A-Fa-o0-9:\.]+\s+[A-Fa-o0-9:\.]+\s+[A-Fa-f0-9:\.]+',
+        'standby-brief.priority'   : r'\s+\d+\s+(\d+)\s+\w+\s+[A-Fa-o0-9:\.]+\s+[A-Fa-z0-9:\.]+\s+[A-Fa-f0-9:\.]+',
+        'standby-brief.state'      : r'\s+\d+\s+\d+\s+(\w+)\s+[A-Fa-o0-9:\.]+\s+[A-Fa-z0-9:\.]+\s+[A-Fa-f0-9:\.]+',
+        'standby-brief.active'     : r'\s+\d+\s+\d+\s+\w+\s+([A-Fa-o0-9:\.]+)\s+[A-Fa-z0-9:\.]+\s+[A-Fa-f0-9:\.]+',
+        'standby-brief.standby'    : r'\s+\d+\s+\d+\s+\w+\s+[A-Fa-o0-9:\.]+\s+([A-Fa-z0-9:\.]+)\s+[A-Fa-f0-9:\.]+',
+        'standby-brief.virtual-ip' : r'\s+\d+\s+\d+\s+\w+\s+[A-Fa-o0-9:\.]+\s+[A-Fa-z0-9:\.]+\s+([A-Fa-f0-9:\.]+)',
 
     },
 }

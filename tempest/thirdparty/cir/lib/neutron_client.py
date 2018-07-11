@@ -22,7 +22,6 @@ class NeutronClient:
         self.conn = lnxCon(conn_info,
                            userName=self.user,
                            pwTacacs=self.pw)
-        temp_conn = self.conn
         self.conn.send_command("stty cols 254")
 
     def get_os_suffix(self):
@@ -33,8 +32,8 @@ class NeutronClient:
             return self.conn.is_connected()
         return False
 
-    def execute(self, cmd, timeout=None, prompt=None,
-                searchwindowsize=None, verify=1):
+    def execute(self, cmd, timeout=None, prompt=None, searchwindowsize=None,
+                verify=1):
         if self.conn is None:
             self.connect()
 
@@ -70,7 +69,8 @@ class NeutronClient:
         return net_list
 
     def net_show(self, net):
-        net_show_out = self.conn.send_command("neutron net-show {0}".format(net))
+        net_show_out = self.conn.send_command(
+            "neutron net-show {0}".format(net))
         net_show = {}
         for line in net_show_out.splitlines():
             if line.startswith("+--") or line.startswith("| Field "):
@@ -84,8 +84,8 @@ class NeutronClient:
         return net_show
 
     def cisco_hosting_device_list(self):
-        device_list_out = \
-            self.conn.send_command("neutron cisco-hosting-device-list")
+        device_list_out = self.conn.send_command(
+            "neutron cisco-hosting-device-list")
         device_list = {}
         for line in device_list_out.splitlines():
             if line.startswith("+--") or line.startswith("| id "):
@@ -103,9 +103,9 @@ class NeutronClient:
 
         return device_list
 
-    def cisco_hosting_device_show(self,id):
-        device_show_out = \
-            self.conn.send_command("neutron cisco-hosting-device-show {0}".format(id))
+    def cisco_hosting_device_show(self, hd_id):
+        device_show_out = self.conn.send_command(
+            "neutron cisco-hosting-device-show {0}".format(hd_id))
         device_show = {}
         for line in device_show_out.splitlines():
             if line.startswith("+--") or line.startswith("| Field "):
@@ -118,20 +118,18 @@ class NeutronClient:
 
         return device_show
 
-    def cisco_hosting_device_update(self, name, id):
-        update_out = \
-            self.conn.send_command(
-                "neutron cisco-hosting-device-update --name {0} {1}".format(
-                    name, id))
+    def cisco_hosting_device_update(self, name, hd_id):
+        update_out = self.conn.send_command(
+            "neutron cisco-hosting-device-update --name {0} {1}".format(name,
+                                                                        hd_id))
         if update_out.startswith('Updated'):
             return True
         return False
 
-    def cisco_hosting_device_list_hosted_routers(self, id):
-        hosted_routers_out = \
-            self.conn.send_command(
-                "neutron cisco-hosting-device-list-hosted-routers "
-                "{0}".format(id))
+    def cisco_hosting_device_list_hosted_routers(self, hd_id):
+        hosted_routers_out = self.conn.send_command(
+            "neutron cisco-hosting-device-list-hosted-routers {0}".format(
+                hd_id))
 
         rtrs_list = {}
         for line in hosted_routers_out.splitlines():
@@ -148,9 +146,8 @@ class NeutronClient:
 
         return rtrs_list
 
-    def cisco_hosting_device_get_config(self, id):
+    def cisco_hosting_device_get_config(self, hd_id):
         asr_cfg = self.send_command(
-            "neutron cisco-hosting-device-get-config {0}".format(id)
-        )
+            "neutron cisco-hosting-device-get-config {0}".format(hd_id))
 
         return asr_cfg

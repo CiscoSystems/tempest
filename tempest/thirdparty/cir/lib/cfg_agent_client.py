@@ -50,6 +50,7 @@ class CfgAgentClient(base.BaseNetworkClient):
                                               config_agent_id,
                                               hosting_device_id):
         hdi_dict = {'hosting_device_id': hosting_device_id}
+        #TODO(bobmel): Clean this up
         #return self.post((ConfigAgentHandlingHostingDevice.resource_path +
         #                  self.CFG_AGENT_HOSTING_DEVICES) % config_agent_id,
         #                 body=body)

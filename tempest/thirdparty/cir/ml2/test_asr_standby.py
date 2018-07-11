@@ -28,6 +28,8 @@ import pdb
 from tempest.thirdparty.cir.lib.device.LogInspector import LogInspector
 from oslo_log import log as logging
 from tempest.lib import decorators
+from tempest.lib.common.utils import data_utils
+from tempest.lib.common.utils import test_utils
 from tempest import config as tempest_conf
 from tempest.scenario import test_network_multi_node
 from tempest import test as test
@@ -47,11 +49,12 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         self.start_time = datetime.datetime.now()
         self.addCleanup(self.check_log_errors)
         self.addCleanup(self.check_cfg_size)
-        self.neutron_client = nc.NeutronClient('NeutronClient',
-                                               ip=CONF.network.controller_ip,
-                                               user=CONF.network.controller_user,
-                                               pw=CONF.network.controller_pw,
-                                               resource_file=CONF.network.controller_rc_file)
+        self.neutron_client = nc.NeutronClient(
+            'NeutronClient',
+            ip=CONF.network.controller_ip,
+            user=CONF.network.controller_user,
+            pw=CONF.network.controller_pw,
+            resource_file=CONF.network.controller_rc_file)
         self.neutron_client.send_command('ls')
 
         self.active_asr = asr.ASR(name=CONF.cisco.asr1,
@@ -87,21 +90,22 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
     def check_cfg_size(self):
         max_time = 120
         sleep_for = 10
-        start_time = time.time()
         current_time = time.time()
         timeout = current_time + max_time
         previous_id = "post-test-{0}".format(current_time)
         while current_time < timeout:
             id = "post-test-{0}".format(current_time)
             current_active_cfg_size = int(self.active_asr.record_cfg_size(id))
-            current_standby_cfg_size = int(self.standby_asr.record_cfg_size(id))
+            current_standby_cfg_size = int(self.standby_asr.record_cfg_size(
+                id))
 
-            previous_active_cfg_size = int(self.active_asr.get_cfg_size(previous_id))
+            previous_active_cfg_size = int(self.active_asr.get_cfg_size(
+                previous_id))
             previous_standby_cfg_size = int(self.standby_asr.get_cfg_size(id))
             previous_id= id
 
-            if (current_active_cfg_size == previous_active_cfg_size) and \
-                    (current_standby_cfg_size == previous_standby_cfg_size):
+            if ((current_active_cfg_size == previous_active_cfg_size) and
+                    (current_standby_cfg_size == previous_standby_cfg_size)):
                 break
 
             time.sleep(sleep_for)
@@ -172,7 +176,7 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
 
     def verify_network_element_ready(self):
         super(TestASRStandBy, self).verify_network_element_ready()
-        ## clear the counters on the ASR interfaces
+        # clear counters on the ASR interfaces
         for segment_id in self.segmentation_ids:
             for asr in [self.active_asr, self.standby_asr]:
                 asr.clear_traffic_counters(segment_id)
@@ -184,20 +188,24 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         self.verify_asrs.check_active_asr(self.segmentation_ids[0])
         self.verify_asrs.netconf_counters()
         self.verify_asrs.vrfs(
-                self.network_client.list_routers()['routers'],
+                self.routers_client.list_routers()['routers'],
                 self.tenant_id,
                 region_id=CONF.network.region1_id)
 
-        self.verify_asrs.nat_pool(self.network_client,
-                                  self.tenant_id,
-                                  region_id=CONF.network.region1_id)
-        self.verify_asrs.nat_translations(self.floating_ip_tuples)
-        self.verify_asrs.acls(self.network_client,
+        #pdb.set_trace()
+        # TODO(bobmel): Re-enable this?
+        #self.verify_asrs.nat_pool(self.routers_client,
+        #                          self.tenant_id,
+        #                          region_id=CONF.network.region1_id)
+        #self.verify_asrs.nat_translations(self.floating_ip_tuples)
+        self.verify_asrs.acls(self.subnets_client,
+                              self.ports_client,
                               self.networks_client,
                               self.tenant_id,
                               self.segmentation_ids,
                               region_id=CONF.network.region1_id)
-        self.verify_asrs.ext_subintf(self.network_client,
+        self.verify_asrs.ext_subintf(self.subnets_client,
+                                     self.routers_client,
                                      self.networks_client,
                                      self.routers,
                                      self.tenant_id,
@@ -207,7 +215,7 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
     def verify_asrs_insync_swo(self):
         self.verify_asrs.check_active_asr(self.segmentation_ids[0])
         self.verify_asrs.netconf_counters()
-        rtrs = self.verify_asrs.get_rtrs(self.network_client, self.tenant_id)
+        rtrs = self.verify_asrs.get_rtrs(self.routers_client, self.tenant_id)
 
         self.verify_asrs.vrf(rtrs['primary'],
                              'ACTIVE',
@@ -216,16 +224,18 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
                              'STANDBY',
                              region_id=CONF.network.region1_id)
 
-        self.verify_asrs.nat_pool(self.network_client,
+        self.verify_asrs.nat_pool(self.routers_client,
                                   self.tenant_id,
                                   region_id=CONF.network.region1_id)
         self.verify_asrs.nat_translations(self.floating_ip_tuples)
-        self.verify_asrs.acls(self.network_client,
+        self.verify_asrs.acls(self.subnets_client,
+                              self.ports_client,
                               self.networks_client,
                               self.tenant_id,
                               self.segmentation_ids,
                               region_id=CONF.network.region1_id)
-        self.verify_asrs.ext_subintf(self.network_client,
+        self.verify_asrs.ext_subintf(self.subnets_client,
+                                     self.routers_client,
                                      self.networks_client,
                                      self.routers,
                                      self.tenant_id,
@@ -250,10 +260,11 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         rtr = self.routers[0]
         external_gw_info = rtr['external_gateway_info']
         # Verify sub interface/NAT/Pool/ACLs configured on ASRs
-        self.verify_asrs.nat_pool(self.network_client,
+        self.verify_asrs.nat_pool(self.routers_client,
                                   self.tenant_id,
                                   region_id=CONF.network.region1_id)
-        self.verify_asrs.acls(self.network_client,
+        self.verify_asrs.acls(self.subnets_client,
+                              self.ports_client,
                               self.networks_client,
                               self.tenant_id,
                               self.segmentation_ids,
@@ -261,15 +272,18 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         netconf_counters = self.active_asr.get_netconf_counters()
 
         # Unset the gateway
-        rtr.unset_gateway()
-        min_transaction = len(self.segmentation_ids) + \
-                          int(netconf_counters['netconf-counters.transactions-total'])
+        kwargs = {'external_gateway_info': None}
+        router = self.routers_client.update_router(rtr['id'],
+                                                   **kwargs)['router']
+        min_transaction = (len(self.segmentation_ids) +
+                           int(netconf_counters[
+                                   'netconf-counters.transactions-total']))
         self.active_asr.wait_for_transactions(min_transaction)
         time.sleep(30)
         netconf_counters = self.active_asr.get_netconf_counters()
         self.verify_asrs.netconf_counters()
         try:
-            self.verify_asrs.nat_pool(self.network_client,
+            self.verify_asrs.nat_pool(self.routers_client,
                                       self.tenant_id,
                                       region_id=CONF.network.region1_id)
             msg = "NAT Pool still configured after GW cleared"
@@ -277,13 +291,19 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         except asr_exceptions.NATPoolNotConfiguredException:
             pass
 
+        time.sleep(90)
         # Reset the gateway
-        rtr.set_gateway(external_gw_info['network_id'])
-        min_transaction = len(self.segmentation_ids) + \
-                          int(netconf_counters['netconf-counters.transactions-total'])
+        # TODO(bobmel): Clean this up
+        kwargs = {'external_gateway_info': dict(
+            network_id=CONF.network.public_network_id)}
+        router = self.routers_client.update_router(rtr['id'],
+                                                   **kwargs)['router']
+        min_transaction = (len(self.segmentation_ids) +
+                           int(netconf_counters[
+                                   'netconf-counters.transactions-total']))
         self.active_asr.wait_for_transactions(min_transaction)
         time.sleep(30)
-        self.verify_asrs.nat_pool(self.network_client,
+        self.verify_asrs.nat_pool(self.routers_client,
                                   self.tenant_id,
                                   region_id=CONF.network.region1_id)
         self.verify_asrs.netconf_counters()
@@ -296,7 +316,7 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
             name = "ASR{0}".format(i)
             i += 1
             self.neutron_client.cisco_hosting_device_update(name=name,
-                                                            id=host_id)
+                                                            hd_id=host_id)
 
         updated_host_devices = self.neutron_client.cisco_hosting_device_list()
         i = 1
@@ -319,7 +339,7 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
             if host_name is None or host_name is '':
                 host_name = "\'\'"
             self.neutron_client.cisco_hosting_device_update(name=host_name,
-                                                            id=host_id)
+                                                            hd_id=host_id)
 
     @testtools.skipUnless(CONF.cisco.asr1,
                           'ASR1 switch not specified in tempest.conf')
@@ -329,7 +349,6 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
     @test.attr(type='asr-regress')
     def test_asr_basic(self):
         #pdb.set_trace()
-        #self.assertTrue(False)
         self.verify_network_create_events()
         self.create_floating_ips()
         self.verify_asrs_insync()
@@ -374,20 +393,33 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
     def test_rtr_gw_set(self):
         self.verify_network_create_events()
         self.delete_vms()
-        self.routers[0].unset_gateway()
+        kwargs = {'external_gateway_info': None }
+        router = self.routers_client.update_router(self.routers[0]['id'],
+                                                   **kwargs)['router']
 
         # 1 Create a router.  Note that the VRF is configured at the ASRs.
-        rtr = self._create_router(namestart="rtr-de918")
+        rtr = self.routers_client.create_router(
+            name=data_utils.rand_name('rtr-de918'),
+            tenant_id=self.tenant_id)['router']
+        self.addCleanup(test_utils.call_and_ignore_notfound_exc,
+                        self.routers_client.delete_router, rtr['id'])
         rtrs = self.verify_asrs.get_backup_rtr(rtr,
-                                               self.network_client,
+                                               self.routers_client,
                                                self.tenant_id)
-
+ 
         # 2 Create the tenant network/subnet.
         net = self._create_network(namestart="net-de918")
-        subnet = self._create_subnet(net)
+        subnet = self.create_subnet(net)
 
         # 3 Add the router interface for the tenant subnet.
-        subnet.add_to_router(rtr['id'])
+        # TODO(bobmel): Clean this up
+        #subnet.add_to_router(rtr['id'])
+        self.routers_client.add_router_interface(rtr['id'],
+                                                 subnet_id=subnet['id'])
+
+        self.addCleanup(test_utils.call_and_ignore_notfound_exc,
+                        self.routers_client.remove_router_interface,
+                        rtr['id'], subnet_id=subnet['id'])
         time.sleep(60)
 
         # 4 Note that only the sub-interface is configured at the ASRs;
@@ -395,12 +427,17 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         self.verify_asrs_de918(rtrs)
 
         # 5 Set the router gateway.
-        rtr.set_gateway(CONF.network.public_network_id)
+        # TODO(bobmel): Clean this up
+        #rtr.set_gateway(CONF.network.public_network_id)
+        kwargs = {'external_gateway_info': dict(
+            network_id=CONF.network.public_network_id)}
+        router = self.routers_client.update_router(rtr['id'],
+                                                   **kwargs)['router']
         time.sleep(60)
 
         # 6 The ACL and the inside source list NAT entry are still not
         # configured at the ASRs
-        #self.verify_asrs_de918(rtrs)
+        self.verify_asrs_de918(rtrs)
 
     @testtools.skipUnless(CONF.cisco.asr1,
                           'ASR1 switch not specified in tempest.conf')
@@ -412,7 +449,7 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         self.verify_asrs.check_active_asr(self.segmentation_ids[0])
         self.create_floating_ips()
         self.verify_asrs_insync()
-        rtrs = self.verify_asrs.get_rtrs(self.network_client, self.tenant_id)
+        rtrs = self.verify_asrs.get_rtrs(self.routers_client, self.tenant_id)
         LOG.info("RTRS: {0}".format(rtrs))
         time.sleep(90)
         state_reports = self.log_inspector.get_state_reports(self.start_time)
@@ -425,7 +462,8 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
 
         expected_fips = len(self.floating_ip_tuples)
         LOG.info("Expected FIPS {0}".format(expected_fips))
-        actual_fips = int(last_full_report['configurations']['total floating_ips'])
+        actual_fips = int(
+            last_full_report['configurations']['total floating_ips'])
         self.assertEqual(expected_fips * 2, actual_fips)
         restart_time = datetime.datetime.now()
         self.restart_neutron()
@@ -439,7 +477,8 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
             if 'configurations' in state_report:
                 last_full_report = state_report
         LOG.info("Expected FIPS {0}".format(expected_fips))
-        actual_fips = int(last_full_report['configurations']['total floating_ips'])
+        actual_fips = int(
+            last_full_report['configurations']['total floating_ips'])
         self.assertEqual(expected_fips * 2, actual_fips)
 
     @testtools.skipUnless(CONF.cisco.asr1,
@@ -457,14 +496,21 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         self.verify_vm_to_vm_connectivity()
         self.verify_network_element_traffic_flows()
         netconf_counters = self.active_asr.get_netconf_counters()
-        target_counters = int(int(netconf_counters['netconf-counters.transactions-total']) * .80)
+        target_counters = int(
+            int(netconf_counters['netconf-counters.transactions-total']) * .80)
         self.reboot_asr(self.active_asr, wait=True)
         self.standby_asr.wait_for_transactions(target=target_counters)
         self.verify_vm_connectivity()
+        # reconnect to standby asr to avoid ssh connection timeout
+        self.standby_asr.conn.relogin()
         self.verify_network_element_ready()
         self.verify_vm_to_vm_connectivity()
         self.verify_network_element_traffic_flows()
+        # TODO(bobmel): Re-enable this?
         #self.verify_asrs_insync_swo()
+        # reconnect to both asrs to avoid ssh connection timeout
+        self.active_asr.conn.relogin()
+        self.standby_asr.conn.relogin()
 
     @testtools.skipUnless(CONF.cisco.asr1,
                           'ASR1 switch not specified in tempest.conf')
@@ -480,13 +526,23 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         self.verify_vm_to_vm_connectivity()
         self.verify_network_element_traffic_flows()
         self.reboot_asr(self.standby_asr, wait=True)
+        # reconnect to standby asr to avoid ssh connection timeout
+        self.active_asr.conn.relogin()
         self.bounce_interface(self.active_asr)
         time.sleep(120)
         self.verify_vm_connectivity()
+        # reconnect to standby asr to avoid ssh connection timeout
+        self.active_asr.conn.relogin()
         self.verify_network_element_ready()
         self.verify_vm_to_vm_connectivity()
+        #import pdb; pdb.set_trace()
         self.verify_network_element_traffic_flows()
+        #import pdb; pdb.set_trace()
+        # TODO(bobmel): Re-enable this?
         #self.verify_asrs_insync()
+        # reconnect to both asrs to avoid ssh connection timeout
+        self.active_asr.conn.relogin()
+        self.standby_asr.conn.relogin()
 
     @testtools.skipUnless(CONF.cisco.asr1,
                           'ASR1 switch not specified in tempest.conf')
@@ -512,4 +568,5 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         self.verify_network_element_ready()
         self.verify_vm_to_vm_connectivity()
         self.verify_network_element_traffic_flows()
+        # TODO(bobmel): Re-enable this?
         #self.verify_asrs_insync_swo()

@@ -71,9 +71,10 @@ class devCon(pexpect.spawn):
         Connect to device
         """
         self.connected = False
-        pexpect.spawn.__init__(self, self.connectInfo, logfile=self.logfile, \
-        maxread=self.maxread, searchwindowsize=self.searchwindowsize, \
-        timeout=self.timeout)
+        pexpect.spawn.__init__(self, self.connectInfo, logfile=self.logfile,
+                               maxread=self.maxread,
+                               searchwindowsize=self.searchwindowsize,
+                               timeout=self.timeout)
         try:
             if self.devInfo['searchMsgs']['enable']:
                 lines = self.devInfo['searchMsgs']['msgs'].strip()
@@ -83,7 +84,7 @@ class devCon(pexpect.spawn):
         except (TypeError, KeyError):
             self.searchMsgs = None
 
-        if timeout == None:
+        if timeout is None:
             timeout = self.timeout
 
         self.login(timeout=timeout)
@@ -103,10 +104,10 @@ class devCon(pexpect.spawn):
         if timeout == None:
             timeout = self.timeout
 
-        pl = ['RETURN to get started', 'Escape character is.*\.', \
-        'not ready for login', '[uU]sername:[\s]*$', '[lL]ogin:[\s]*$', \
-        '[pP]assword:[\s]*$', 'Permission denied ', '[yY]es', \
-        self.shPrompt2, self.shPrompt1, self.prompt]
+        pl = ['RETURN to get started', 'Escape character is.*\.',
+              'not ready for login', '[uU]sername:[\s]*$', '[lL]ogin:[\s]*$',
+              '[pP]assword:[\s]*$', 'Permission denied ', '[yY]es',
+              self.shPrompt2, self.shPrompt1, self.prompt]
         cpl = self.compile_pattern_list(pl)
 
         count = 0
@@ -118,8 +119,8 @@ class devCon(pexpect.spawn):
                 i = self.expect_list(cpl, timeout=timeout)
 
                 if self.searchMsgs != None:
-                    ml = [m for m in self.searchMsgs if\
-                    re.search(re.escape(m), self.before)]
+                    ml = [m for m in self.searchMsgs if re.search(re.escape(m),
+                                                                  self.before)]
                     if len(ml):
                         self.logger.info("### Found \'{0}\' ###".format(ml))
                         self.errMsgs.extend(ml)
@@ -127,12 +128,13 @@ class devCon(pexpect.spawn):
                     self.sendline('')
                 elif i == 2:
                     tmout = 20*n
-                    self.logger.debug("Sleeping {0} seconds".format(str(tmout)))
+                    self.logger.debug("Sleeping {0} seconds".format(
+                        str(tmout)))
                     time.sleep(tmout)
                 elif (i == 3) or (i == 4):
                     self.sendline(self.userName)
-                    j = self.expect(['[pP]assword:[\s]*$', '[sS]ecret:', \
-                        'Authentication failed'], timeout=timeout)
+                    j = self.expect(['[pP]assword:[\s]*$', '[sS]ecret:',
+                                     'Authentication failed'], timeout=timeout)
                     if j == 0:
                         self.sendline(self.pwTacacs)
                     elif j == 1:
@@ -154,9 +156,10 @@ class devCon(pexpect.spawn):
                     kh = str(lst.pop())
                     cmd = "sed -i \'{0}d\' {1} > {2}".format(ln, kh, kh)
                     os.system(cmd)
-                    pexpect.spawn.__init__(self, self.connectInfo, \
-                    logfile=self.logfile, maxread=self.maxread, \
-                    searchwindowsize=self.searchwindowsize)
+                    pexpect.spawn.__init__(
+                        self, self.connectInfo, logfile=self.logfile,
+                        maxread=self.maxread,
+                        searchwindowsize=self.searchwindowsize)
                 elif i == 7:
                     self.sendline('yes')
                 elif (i == 8) or (i == 9):
@@ -174,8 +177,8 @@ class devCon(pexpect.spawn):
                 if count < 3:
                     self.sendline('')
                 else:
-                    raise pexpect.TIMEOUT("Connection timeout\n %s " \
-                                    % str(self))
+                    raise pexpect.TIMEOUT("Connection timeout\n %s " %
+                                          str(self))
             except Exception as e:
                 raise Exception("Error {0}".format(e.message))
 
@@ -185,18 +188,18 @@ class devCon(pexpect.spawn):
     def get_os_suffix(self):
         return '-' + self.devType
 
-    def execute(self, cmd, timeout=None, prompt=None, \
-                        searchwindowsize=None, verify=1):
+    def execute(self, cmd, timeout=None, prompt=None, searchwindowsize=None,
+                verify=1):
         """
         Execute the command and verify expected prompt
         """
 
-        if prompt == None:
+        if prompt is None:
             prompt = self.prompt
-        if timeout == None:
+        if timeout is None:
             timeout = self.timeout
 
-        if verify == None:
+        if verify is None:
             self.sendline(cmd)
         else:
             try:
@@ -213,9 +216,9 @@ class devCon(pexpect.spawn):
         while True:
             count += 1
             try:
-                i = self.expect([prompt, '-- MORE --'], timeout=timeout, \
-                searchwindowsize=searchwindowsize)
-                if self.searchMsgs != None:
+                i = self.expect([prompt, '-- MORE --'], timeout=timeout,
+                                searchwindowsize=searchwindowsize)
+                if self.searchMsgs is not None:
                     ml = [m for m in self.searchMsgs if\
                     re.search(re.escape(m), self.before)]
                     if len(ml):
@@ -225,17 +228,16 @@ class devCon(pexpect.spawn):
                     break
                 elif i == 1:
                     self.send(' ')
-
             except pexpect.EOF:
-                raise pexpect.EOF('command "%s" failed - EOF \n %s '\
-                                        % (cmd, str(self)))
+                raise pexpect.EOF('command "%s" failed - EOF \n %s ' % (
+                    cmd, str(self)))
             except pexpect.TIMEOUT:
                 if count < 3:
                     self.sendline(' ')
                     timeout = 5
                 else:
-                    raise pexpect.TIMEOUT('command "%s" timeout \n %s \
-                                            '% (cmd, str(self)))
+                    raise pexpect.TIMEOUT('command "%s" timeout \n %s ' % (
+                        cmd, str(self)))
             except Exception as e:
                 self.disconnect()
                 raise Exception("Error {0}".format(e.message))
@@ -255,7 +257,7 @@ class devCon(pexpect.spawn):
         """
         print("Not implemented yet")
 
-    def sshCopyFrom(self, remoteHost, remoteFile, localPath, sshPort=None, \
+    def sshCopyFrom(self, remoteHost, remoteFile, localPath, sshPort=None,
                     user="root", passwd="lab"):
         """
         ssh scp a file from the remote host
@@ -266,14 +268,14 @@ class devCon(pexpect.spawn):
             self.execute("touch %s" % localPath)
         while True:
             if sshPort == "None":
-                self.sendline('scp {0}@{1}:{2} {3}'.format(user, remoteHost, \
-                            remoteFile, localPath))
+                self.sendline('scp {0}@{1}:{2} {3}'.format(
+                    user, remoteHost, remoteFile, localPath))
             else:
-                self.sendline('scp -P {0} {1}@{2}:{3} {4}'.format(sshPort, \
-                            user, remoteHost, remoteFile, localPath))
+                self.sendline('scp -P {0} {1}@{2}:{3} {4}'.format(
+                    sshPort, user, remoteHost, remoteFile, localPath))
             try:
-                i = self.expect([r'[pP]assword:', r'Permission denied', \
-                                r'[yY]es'])
+                i = self.expect([r'[pP]assword:', r'Permission denied',
+                                 r'[yY]es'])
                 if i == 0:
                     self.execute(passwd, timeout=300)
                     break
@@ -327,8 +329,7 @@ class devCon(pexpect.spawn):
         '''Configures port channel feature on switch'''
 
         feature_cfg_str = "\n feature lacp \n feature vpc \n"
-        self.logger.info("Enable LACP/VPC on the switch %s", \
-                         feature_cfg_str)
+        self.logger.info("Enable LACP/VPC on the switch %s", feature_cfg_str)
         self.config(feature_cfg_str)
         return
 
@@ -342,15 +343,17 @@ class devCon(pexpect.spawn):
         elif re.match(r'.*peer_link.*|.*ucs_link.*', intf_type):
             interface_name = "port-channel" + str(interface_name)
             reset_cfg_str = "no interface " + str(interface_name) + "\n"
+        else:
+            reset_cfg_str = ""
 
-        self.logger.info("Restting interface config via: \n %s", \
-                         reset_cfg_str)
+        self.logger.info("Restting interface config via: \n %s", reset_cfg_str)
         self.config(reset_cfg_str)
         return 1
 
-    def configure_switch_port(self, vlan_mode, interface_name, vlan_id, \
-            speed=0, description="Undefined", nxos_plugin="no", \
-            intf_type=None, channel_group=0, split_info=0):
+    def configure_switch_port(self, vlan_mode, interface_name, vlan_id,
+                              speed=0, description="Undefined",
+                              nxos_plugin="no", intf_type=None,
+                              channel_group=0, split_info=0):
         """
         This function configures a switch in access or trunk mode
         """
@@ -362,8 +365,8 @@ class devCon(pexpect.spawn):
             init_cfg_str = init_cfg_str + "speed " + str(speed) + "\n"
 
         if not re.match(r'Undefined', description):
-            init_cfg_str = init_cfg_str + "description via_script " \
-                            + str(description) + "\n"
+            init_cfg_str = (init_cfg_str + "description via_script " +
+                            str(description) + "\n")
 
         reset_cfg_str = ""
 
@@ -383,22 +386,24 @@ class devCon(pexpect.spawn):
             reset_cfg_str = "default interface " + str(interface_name) + "\n"
         elif re.match(r'peer_link', intf_type):
             interface_name = "port-channel" + str(interface_name)
-            vpc_cfg_str = "\n spanning-tree port type network \n vpc peer-link \n"
+            vpc_cfg_str = ("\n spanning-tree port type network \n vpc "
+                           "peer-link \n")
         elif re.match(r'ucs_link', intf_type):
             intf_id = interface_name
             interface_name = "port-channel" + str(interface_name)
-            vpc_cfg_str = "\n spanning-tree port type edge trunk \n \
-                shut\n no lacp suspend-individual\n vpc " + str(intf_id) + "\n"
+            vpc_cfg_str = ("\n spanning-tree port type edge trunk \n shut\n "
+                           "no lacp suspend-individual\n vpc " + str(intf_id) +
+                           "\n")
 
         if channel_group:
-            channel_grp_str = "\n channel-group " + str(channel_group) + " mode active"
+            channel_grp_str = ("\n channel-group " + str(channel_group) +
+                               " mode active")
         else:
             channel_grp_str = ""
 
         cfg_str = "interface " + str(interface_name) + init_cfg_str
 
-        if re.match(r'no', nxos_plugin) and \
-            not re.match(r'all', str(vlan_id)):
+        if re.match(r'no', nxos_plugin) and not re.match(r'all', str(vlan_id)):
             cfg_vlan = "vlan " + str(vlan_id) + "\n no shut \n"
         else:
             cfg_vlan = ""
@@ -408,33 +413,32 @@ class devCon(pexpect.spawn):
         self.logger.debug("VLAN MODE ***** %s", vlan_mode)
 
         if re.match(r'access', vlan_mode):
-            cfg_str_add = "switchport " + vlan_mode +  " vlan " + str(vlan_id)
+            cfg_str_add = "switchport " + vlan_mode + " vlan " + str(vlan_id)
         elif re.match(r'trunk', vlan_mode):
             self.logger.debug("inside VLAN MODE ***** %s", str(vlan_mode))
             if re.match(r'no', nxos_plugin):
                 if not channel_group:
-                    cfg_str_add = "switchport mode trunk \n switchport " + \
-                        vlan_mode + " allowed vlan " + str(vlan_id)
+                    cfg_str_add = ("switchport mode trunk \n switchport " +
+                                   vlan_mode + " allowed vlan " + str(vlan_id))
             else:
-                cfg_str_add = "switchport mode trunk \n switchport " + \
-                        vlan_mode + " allowed vlan none"
+                cfg_str_add = ("switchport mode trunk \n switchport " +
+                               vlan_mode + " allowed vlan none")
 
         if len(reset_cfg_str):
-            self.logger.info("Restting interface config via: \n %s", \
-                         reset_cfg_str)
+            self.logger.info("Restting interface config via: \n %s",
+                             reset_cfg_str)
             self.config(reset_cfg_str)
 
-        cfg_2_apply = cfg_vlan + cfg_str + \
-                    cfg_str_add + vpc_cfg_str + \
-                    channel_grp_str + " \n shut \n no shut"
+        cfg_2_apply = (cfg_vlan + cfg_str + cfg_str_add + vpc_cfg_str +
+                       channel_grp_str + " \n shut \n no shut")
 
         self.logger.debug("config to apply \n %s", cfg_2_apply)
         #print 'config to apply \n %s'  %(cfg_2_apply)
         self.config(cfg_2_apply)
 
 
-    def configure_vlan_on_switch(self, vlan_id, ip_address, mask, \
-                                action="cfg"):
+    def configure_vlan_on_switch(self, vlan_id, ip_address, mask,
+                                 action="cfg"):
         """
         This function configures/uncfgs a vlan in a switch
         """
@@ -447,16 +451,15 @@ class devCon(pexpect.spawn):
 
         cfg_str = ''
         if re.match(r'cfg', action) and len(ip_address):
-            cfg_str = "feature interface-vlan \n interface vlan " + \
-                str(vlan_id) + "\n ip address " + \
-                str(ip_address) + "/" + str(mask) + "\n no shut"
+            cfg_str = ("feature interface-vlan \n interface vlan " +
+                       str(vlan_id) + "\n ip address " + str(ip_address) +
+                       "/" + str(mask) + "\n no shut")
 
         if re.match(r'.*all.*|.*none.*', vlan_id):
             cfg_2_apply = "feature interface-vlan \n"
         elif re.match(r'cfg', action):
-            cfg_vlan = "feature interface-vlan \n \
-                    no vlan " + str(vlan_id) + "\n vlan " \
-                    + str(vlan_id) + "\n no shut \n"
+            cfg_vlan = ("feature interface-vlan \n no vlan " + str(vlan_id) +
+                        "\n vlan " + str(vlan_id) + "\n no shut \n")
             cfg_2_apply = cfg_vlan + cfg_str
         else:
             cfg_2_apply = "no vlan " + str(vlan_id)
@@ -487,8 +490,8 @@ class devCon(pexpect.spawn):
         else:
             return 0
 
-    def verify_switch_port_config(self, vlan_mode, interface_name, \
-                vlan_id, nxos_plugin="no", channel_group=0):
+    def verify_switch_port_config(self, vlan_mode, interface_name, vlan_id,
+                                  nxos_plugin="no", channel_group=0):
         """
         This function checks config of a switch port
         """
@@ -530,7 +533,7 @@ class devCon(pexpect.spawn):
         return result1, result2
 
     def execute_cmd_on_device(self, cmd):
-        ''' executes a command on device'''
+        """executes a command on device"""
         self.execute(cmd)
         output = str(self.before)
         return output
@@ -545,6 +548,7 @@ class devCon(pexpect.spawn):
         result = re.search(search_str, str(self.before))
         return result
 
+
 class calCon(devCon):
     """
     This class implements a connection session to calvados
@@ -552,17 +556,18 @@ class calCon(devCon):
 
     hostPrompt = r"host:~\]\$ "
     shPrompt = r"sysadmin.*\]\$ "
-    def __init__(self, connectInfo, prompt=None, timeout=10, userName='root', \
-    pwTacacs='lab', delay_before_send=0.04, logfile=None, maxread=2000, \
-    searchwindowsize=None, devType="calvados", **kargs):
+    def __init__(self, connectInfo, prompt=None, timeout=10, userName='root',
+                 pwTacacs='lab', delay_before_send=0.04, logfile=None,
+                 maxread=2000, searchwindowsize=None, devType="calvados",
+                 **kargs):
         """
         Initialize a calvados object
         """
-        devCon.__init__(self, connectInfo, prompt=prompt, \
-        timeout=timeout, userName=userName, pwTacacs=pwTacacs, \
-        delay_before_send=delay_before_send, logfile=logfile, \
-        maxread=maxread, searchwindowsize=searchwindowsize, \
-        devType=devType, **kargs)
+        devCon.__init__(self, connectInfo, prompt=prompt, timeout=timeout,
+                        userName=userName, pwTacacs=pwTacacs,
+                        delay_before_send=delay_before_send, logfile=logfile,
+                        maxread=maxread, searchwindowsize=searchwindowsize,
+                        devType=devType, **kargs)
 
         self.connect()
         self.hostPrompt = calCon.hostPrompt
@@ -575,7 +580,7 @@ class calCon(devCon):
         """
         Execute command(s) in config mode
         """
-        __config__(self, cmds, timeout=timeout, prompt=prompt, \
+        __config__(self, cmds, timeout=timeout, prompt=prompt,
                    searchwindowsize=searchwindowsize)
 
     def gotoShell(self):
@@ -605,8 +610,8 @@ class calCon(devCon):
         else:
             location = str(location)
         self.gotoConsole()
-        self.execute("hw-module location {0} reload".format(location), \
-        prompt=r'Reload hardware module.*yes\]', verify=None)
+        self.execute("hw-module location {0} reload".format(location),
+                     prompt=r'Reload hardware module.*yes\]', verify=None)
         self.execute('yes', verify=None)
         self.relogin(timeout=timeout, waitTime=120)
 
@@ -616,23 +621,24 @@ class calCon(devCon):
         """
         devCon.relogin(self, timeout=timeout, waitTime=waitTime)
 
+
 class nxosCon(devCon):
     """
     This class implements a connection session to nxos
     """
 
-    def __init__(self, connectInfo, prompt=None, timeout=10, userName='root', \
-                pwTacacs='lab', delay_before_send=0.04, logfile=None, \
-                maxread=2000, searchwindowsize=None, devType="nxos", \
-                machineType="switch", **kargs):
+    def __init__(self, connectInfo, prompt=None, timeout=10, userName='root',
+                 pwTacacs='lab', delay_before_send=0.04, logfile=None,
+                 maxread=2000, searchwindowsize=None, devType="nxos",
+                 machineType="switch", **kargs):
         """
         Initialize a nxos object
         """
-        devCon.__init__(self, connectInfo, prompt=prompt, \
-        timeout=timeout, userName=userName, pwTacacs=pwTacacs, \
-        delay_before_send=delay_before_send, logfile=logfile, \
-        maxread=maxread, searchwindowsize=searchwindowsize, \
-        devType=devType, machineType=machineType, **kargs)
+        devCon.__init__(self, connectInfo, prompt=prompt, timeout=timeout,
+                        userName=userName, pwTacacs=pwTacacs,
+                        delay_before_send=delay_before_send, logfile=logfile,
+                        maxread=maxread, searchwindowsize=searchwindowsize,
+                        devType=devType, machineType=machineType, **kargs)
 
         self.connect()
 
@@ -651,7 +657,7 @@ class nxosCon(devCon):
         """
         Execute command(s) in config mode
         """
-        __config__(self, cmds, timeout=timeout, prompt=prompt, \
+        __config__(self, cmds, timeout=timeout, prompt=prompt,
                    searchwindowsize=searchwindowsize)
 
 
@@ -663,17 +669,17 @@ class xrCon(devCon):
     hostPrompt = r"host:~\]\$ "
     shPrompt = r"RP.*\]\$ "
 
-    def __init__(self, connectInfo, prompt=None, timeout=10, userName='root', \
-    pwTacacs='lab', delay_before_send=0.04, logfile=None, maxread=2000, \
-    searchwindowsize=None, devType="xr", **kargs):
+    def __init__(self, connectInfo, prompt=None, timeout=10, userName='root',
+                 pwTacacs='lab', delay_before_send=0.04, logfile=None,
+                 maxread=2000, searchwindowsize=None, devType="xr", **kargs):
         """
         Initialize a xr object
         """
-        devCon.__init__(self, connectInfo, prompt=prompt, \
-        timeout=timeout, userName=userName, pwTacacs=pwTacacs, \
-        delay_before_send=delay_before_send, logfile=logfile, \
-        maxread=maxread, searchwindowsize=searchwindowsize, \
-        devType=devType, **kargs)
+        devCon.__init__(self, connectInfo, prompt=prompt, timeout=timeout,
+                        userName=userName, pwTacacs=pwTacacs,
+                        delay_before_send=delay_before_send, logfile=logfile,
+                        maxread=maxread, searchwindowsize=searchwindowsize,
+                        devType=devType, **kargs)
 
         self.connect()
         self.hostPrompt = xrCon.hostPrompt
@@ -690,7 +696,7 @@ class xrCon(devCon):
         """
         Execute command(s) in config mode
         """
-        __config__(self, cmds, timeout=timeout, prompt=prompt, \
+        __config__(self, cmds, timeout=timeout, prompt=prompt,
                    searchwindowsize=searchwindowsize)
 
     def gotoShell(self):
@@ -717,23 +723,25 @@ class xrCon(devCon):
         """
         devCon.relogin(self, timeout=timeout, waitTime=waitTime)
 
+
 class lnxCon(devCon):
     """
     This class implements a connection session to linux
     """
 
-    def __init__(self, connectInfo, prompt=None, timeout=30, userName='root', \
-    pwTacacs='lab', delay_before_send=0.04, logfile=None, maxread=2000, \
-    searchwindowsize=None, devType="linux", **kargs):
+    def __init__(self, connectInfo, prompt=None, timeout=30, userName='root',
+                 pwTacacs='lab', delay_before_send=0.04, logfile=None,
+                 maxread=2000,
+                 searchwindowsize=None, devType="linux", **kargs):
         """
         Initialize a linux object
         """
 
-        devCon.__init__(self, connectInfo, prompt=prompt, \
-        timeout=timeout, userName=userName, pwTacacs=pwTacacs, \
-        delay_before_send=delay_before_send, logfile=logfile, \
-        maxread=maxread, searchwindowsize=searchwindowsize, \
-        devType=devType, **kargs)
+        devCon.__init__(self, connectInfo, prompt=prompt, timeout=timeout,
+                        userName=userName, pwTacacs=pwTacacs,
+                        delay_before_send=delay_before_send, logfile=logfile,
+                        maxread=maxread, searchwindowsize=searchwindowsize,
+                        devType=devType, **kargs)
 
         self.connect()
         self.execute('uname -a')
@@ -742,7 +750,7 @@ class lnxCon(devCon):
             self.execute('connect host', prompt="login:")
             self.relogin(waitTime=5)
 
-    def execute(self, cmd, timeout=None, prompt=None, searchwindowsize=None, \
+    def execute(self, cmd, timeout=None, prompt=None, searchwindowsize=None,
                 verify=None):
         """
         Execute the command
@@ -751,8 +759,8 @@ class lnxCon(devCon):
             prompt = self.prompt
         if timeout == None:
             timeout = self.timeout
-        devCon.execute(self, cmd, timeout, prompt, \
-                    searchwindowsize=searchwindowsize, verify=verify)
+        devCon.execute(self, cmd, timeout, prompt,
+                       searchwindowsize=searchwindowsize, verify=verify)
 
     def disconnect(self):
         """
@@ -765,29 +773,30 @@ class lnxCon(devCon):
         """
         Reboot linux
         """
-        self.execute('reboot', prompt='The system is going down for \
-                        reboot NOW!')
+        self.execute('reboot',
+                     prompt='The system is going down for reboot NOW!')
         self.relogin(timeout=timeout, waitTime=20)
 
     reboot = reload
+
 
 class iosCon(devCon):
     """
     This class implements a connection session to ios
     """
 
-    def __init__(self, connectInfo, prompt=None, timeout=10, userName='root', \
-                pwTacacs='lab', delay_before_send=0.04, logfile=None, \
-                maxread=2000, searchwindowsize=None, devType="ios", \
-                machineType="router", **kargs):
+    def __init__(self, connectInfo, prompt=None, timeout=10, userName='root',
+                 pwTacacs='lab', delay_before_send=0.04, logfile=None,
+                 maxread=2000, searchwindowsize=None, devType="ios",
+                 machineType="router", **kargs):
         """
         Initialize a nxos object
         """
-        devCon.__init__(self, connectInfo, prompt=prompt, \
-        timeout=timeout, userName=userName, pwTacacs=pwTacacs, \
-        delay_before_send=delay_before_send, logfile=logfile, \
-        maxread=maxread, searchwindowsize=searchwindowsize, \
-        devType=devType, machineType=machineType, **kargs)
+        devCon.__init__(self, connectInfo, prompt=prompt,
+                        timeout=timeout, userName=userName, pwTacacs=pwTacacs,
+                        delay_before_send=delay_before_send, logfile=logfile,
+                        maxread=maxread, searchwindowsize=searchwindowsize,
+                        devType=devType, machineType=machineType, **kargs)
 
         self.connect()
 
@@ -806,56 +815,56 @@ class iosCon(devCon):
         """
         Execute command(s) in config mode
         """
-        __config__(self, cmds, timeout=timeout, prompt=prompt, \
+        __config__(self, cmds, timeout=timeout, prompt=prompt,
                    searchwindowsize=searchwindowsize)
 
 
-
 ### functions ###
-def uConsole(connectInfo, prompt=None, timeout=10, userName='root', \
-    pwTacacs='lab', delay_before_send=0.04, logfile=None, maxread=2000, \
-    searchwindowsize=None, devType="calvados", **kargs):
+def uConsole(connectInfo, prompt=None, timeout=10, userName='root',
+             pwTacacs='lab', delay_before_send=0.04, logfile=None,
+             maxread=2000, searchwindowsize=None, devType="calvados", **kargs):
     """
     Connect and return an initialized object
     """
 
     if devType == "calvados":
         print "\nConnecting to calvados\n"
-        return calCon(connectInfo, prompt=prompt, \
-        timeout=timeout, userName=userName, pwTacacs=pwTacacs, \
-        delay_before_send=delay_before_send, logfile=logfile, \
-        maxread=maxread, searchwindowsize=searchwindowsize, \
-        **kargs)
+        return calCon(connectInfo, prompt=prompt, timeout=timeout,
+                      userName=userName, pwTacacs=pwTacacs,
+                      delay_before_send=delay_before_send, logfile=logfile,
+                      maxread=maxread, searchwindowsize=searchwindowsize,
+                      **kargs)
     elif devType == "xr":
         print "\nConnecting to xr\n"
-        return xrCon(connectInfo, prompt=prompt, \
-        timeout=timeout, userName=userName, pwTacacs=pwTacacs, \
-        delay_before_send=delay_before_send, logfile=logfile, \
-        maxread=maxread, searchwindowsize=searchwindowsize, \
-        **kargs)
+        return xrCon(connectInfo, prompt=prompt, timeout=timeout,
+                     userName=userName, pwTacacs=pwTacacs,
+                     delay_before_send=delay_before_send,
+                     logfile=logfile, maxread=maxread,
+                     searchwindowsize=searchwindowsize, **kargs)
     elif devType == "linux":
         print "\nConnecting to linux/host\n"
-        return lnxCon(connectInfo, prompt=prompt, \
-        timeout=timeout, userName=userName, pwTacacs=pwTacacs, \
-        delay_before_send=delay_before_send, logfile=logfile, \
-        maxread=maxread, searchwindowsize=searchwindowsize, \
-        **kargs)
+        return lnxCon(connectInfo, prompt=prompt, timeout=timeout,
+                      userName=userName, pwTacacs=pwTacacs,
+                      delay_before_send=delay_before_send,
+                      logfile=logfile, maxread=maxread,
+                      searchwindowsize=searchwindowsize, **kargs)
     elif devType == "nxos":
         print "\nConnecting to nxos\n"
-        return nxosCon(connectInfo, prompt=prompt, \
-        timeout=timeout, userName=userName, pwTacacs=pwTacacs, \
-        delay_before_send=delay_before_send, logfile=logfile, \
-        maxread=maxread, searchwindowsize=searchwindowsize, \
-        **kargs)
+        return nxosCon(connectInfo, prompt=prompt, timeout=timeout,
+                       userName=userName, pwTacacs=pwTacacs,
+                       delay_before_send=delay_before_send, logfile=logfile,
+                       maxread=maxread, searchwindowsize=searchwindowsize,
+                       **kargs)
     elif devType == "ios":
         print "\nConnecting to ios\n"
-        return nxosCon(connectInfo, prompt=prompt, \
-        timeout=timeout, userName=userName, pwTacacs=pwTacacs, \
-        delay_before_send=delay_before_send, logfile=logfile, \
-        maxread=maxread, searchwindowsize=searchwindowsize, \
-        **kargs)
+        return nxosCon(connectInfo, prompt=prompt, timeout=timeout,
+                       userName=userName, pwTacacs=pwTacacs,
+                       delay_before_send=delay_before_send, logfile=logfile,
+                       maxread=maxread, searchwindowsize=searchwindowsize,
+                       **kargs)
     else:
         raise TypeError("Invalid device type {0}".format(devType))
+
 
 def __gotoShell__(uut):
     """
@@ -892,11 +901,12 @@ def __gotoCon__(uut):
             else:
                 break
     except pexpect.EOF:
-        raise pexpect.EOF('__gotoCon__ failed - EOF \n %s '% (str(uut)))
+        raise pexpect.EOF('__gotoCon__ failed - EOF \n %s ' % (str(uut)))
     except pexpect.TIMEOUT:
-        raise pexpect.TIMEOUT('__gotoCon__ timeout\n %s '% (str(uut)))
+        raise pexpect.TIMEOUT('__gotoCon__ timeout\n %s ' % (str(uut)))
     except Exception as e:
         uut.disconnect()
+
 
 def __gotoHost__(uut):
     """
@@ -905,8 +915,8 @@ def __gotoHost__(uut):
     try:
         uut.sendline('')
         while True:
-            i = uut.expect([uut.hostPrompt, uut.shPrompt, uut.prompt, \
-                "[pP]assword:"])
+            i = uut.expect([uut.hostPrompt, uut.shPrompt, uut.prompt,
+                            "[pP]assword:"])
             if i == 0:
                 break
             elif i == 1:
@@ -923,20 +933,20 @@ def __gotoHost__(uut):
         uut.disconnect()
         raise Exception("Error {0}".format(e.message))
 
+
 def __config__(uut, cmds, timeout=None, prompt=None, searchwindowsize=None):
     """
     Execute command(s) in config mode
     """
 
-    if prompt == None:
+    if prompt is None:
         prompt = r'\)#[\s]*$'
-    if timeout == None:
+    if timeout is None:
         timeout = uut.timeout
 
     uut.execute('config t', prompt=prompt, timeout=timeout, verify=None)
     for cmd in cmds.split("\n"):
         uut.execute(cmd, prompt=prompt, timeout=timeout, verify=None)
-    cmd = cmd.strip()
     if uut.devType == "xr":
         uut.execute('commit', prompt=prompt, timeout=timeout, verify=None)
     uut.execute('end')

@@ -15,10 +15,10 @@
 import collections
 import re
 import time
-import pdb
 
 from oslo_log import log as logging
 from tempest.lib.common.utils import data_utils
+from tempest.lib.common.utils import test_utils
 
 from tempest import config
 from tempest.scenario import manager
@@ -127,13 +127,17 @@ class TestNetworkMultiNode(manager.NetworkScenarioTest):
             pass
 
     def _create_server(self, name, network, zone=None):
-        create_kwargs = self.srv_kwargs
-        create_kwargs['networks'] = [{'uuid': network['id']}]
+        security_groups = [
+            {'name': self._create_security_group()['name']}
+        ]
+        network = {'uuid': network['id']}
         if zone is not None:
             create_kwargs['availability_zone'] = zone
         server = self.create_server(name=name,
-                                    wait_on_boot=True,
-                                    create_kwargs=create_kwargs)
+                                    networks=[network],
+                                    key_name=self.keypair['name'],
+                                    security_groups=security_groups,
+                                    wait_until='ACTIVE')
         return dict(server=server, keypair=self.keypair)
 
     def setup_aggregates(self):
@@ -184,7 +188,6 @@ class TestNetworkMultiNode(manager.NetworkScenarioTest):
         self.linux_client = None
         self.private_key = None
         self.servers = {}
-        self.srv_kwargs = {'key_name': self.keypair['name']}
         self.tenant_id = self.manager.identity_client.tenant_id
         self.total_expected_pkts = 0
         self.total_expected_bytes = 0
@@ -223,32 +226,12 @@ class TestNetworkMultiNode(manager.NetworkScenarioTest):
         LOG.debug("Number of instances per Network/compute = {0}".
                   format(self.number_instances_per_compute))
         LOG.debug("Number of Networks = {0}".format(self.num_networks))
-        #pdb.set_trace()
-        self.security_group = self._create_security_group(
-            tenant_id=self.tenant_id)
-        my_security_groups = [{'name': self.security_group['name']}]
-        self.srv_kwargs['security_groups'] = my_security_groups
-        try:
-            self._create_loginable_secgroup_rule(secgroup=self.security_group)
-        except Exception as e:
-            LOG.debug("Login sec group already exists: {0}".format(e))
 
         self.setup_networks()
         self.setup_vms()
 
     def add_network(self, client=None, tenant_id=None, router=None,
                     vlan_transparent=False):
-        #if CONF.baremetal.driver_enabled:
-        #network = self._get_network_by_name(
-        #       CONF.compute.fixed_network_name)
-        #router = None
-        #subnet = None
-        #else:
-        #if CONF.network_feature_enabled.vlan_transparent:
-        #    network = self._create_network(client=client,
-        #                                   tenant_id=tenant_id,
-        #                                   vlan_transparent=True)
-        #else:
         network = self._create_network(tenant_id=tenant_id)
         if router is None:
             router = self._get_router(client=client,
@@ -257,9 +240,11 @@ class TestNetworkMultiNode(manager.NetworkScenarioTest):
                 router = self.routers[0]
 
         subnet = self.create_subnet(network=network)
-        #subnet.add_to_router(router.id)
         self.routers_client.add_router_interface(router['id'],
                                                  subnet_id=subnet['id'])
+        self.addCleanup(test_utils.call_and_ignore_notfound_exc,
+                        self.routers_client.remove_router_interface,
+                        router['id'], subnet_id=subnet['id'])
         return network, subnet, router
 
     def setup_networks(self):
@@ -280,9 +265,15 @@ class TestNetworkMultiNode(manager.NetworkScenarioTest):
             segmentation_id = self.network['provider:segmentation_id']
             self.segmentation_ids.append(segmentation_id)
 
+    def delete_router_interface(self):
+        router_id = self.router['id']
+
+        self.addCleanup(test_utils.call_and_ignore_notfound_exc,
+                        self.routers_client.remove_router_interface,
+                        router_id, subnet_id=self.new_subnet['id'])
+
     def setup_vms(self):
         # Create a VM on a each hypervisor per network
-        pdb.set_trace()
         for network in self.networks:
             for aggregate in self.aggregates:
                 name = data_utils.rand_name('server')
@@ -306,10 +297,10 @@ class TestNetworkMultiNode(manager.NetworkScenarioTest):
                 id = server_dict['server']['id']
                 self.assertIsNotNone(server_dict)
                 self.servers[id] = server_dict['keypair']
-                if network.id in self.network_vms:
-                    self.network_vms[network.id].append(id)
+                if network['id'] in self.network_vms:
+                    self.network_vms[network['id']].append(id)
                 else:
-                    self.network_vms[network.id] = [id]
+                    self.network_vms[network['id']] = [id]
 
                 # Safety net for max_instances_per_tenant
                 if len(self.servers) == self.max_instances_per_tenant:
@@ -447,13 +438,12 @@ class TestNetworkMultiNode(manager.NetworkScenarioTest):
         self.private_key = self.servers[server['id']]['private_key']
 
         self.linux_client = self.get_remote_client(
-            server_or_ip=self.linux_client_ip.
-            floating_ip_address,
-            private_key=self.private_key)
+            ip_address=self.linux_client_ip['floating_ip_address'],
+            username='cirros', private_key=self.private_key, server=server)
 
         super(TestNetworkMultiNode, self).check_vm_connectivity(
-            self.linux_client_ip.floating_ip_address,
-            username=CONF.compute.image_ssh_user,
+            self.linux_client_ip['floating_ip_address'],
+            username='cirros',
             private_key=self.private_key,
             should_connect=True)
 
@@ -517,15 +507,13 @@ class TestNetworkMultiNode(manager.NetworkScenarioTest):
                 target_ip, server = fip_tuple
                 for pkt_size in self.test_packet_sizes:
                     self.ping_target_ip(self.linux_client,
-                                        self.linux_client_ip.
-                                        floating_ip_address,
-                                        target_ip.floating_ip_address,
+                                        self.linux_client_ip['floating_ip_address'],
+                                        target_ip['floating_ip_address'],
                                         pkt_size)
                     if not self.ping_fip_only:
                         self.ping_target_ip(self.linux_client,
-                                            self.linux_client_ip.
-                                            floating_ip_address,
-                                            target_ip.fixed_ip_address,
+                                            self.linux_client_ip['floating_ip_address'],
+                                            target_ip['fixed_ip_address'],
                                             pkt_size)
 
         LOG.debug("Received {0} Packets "
@@ -561,10 +549,10 @@ class TestNetworkMultiNode(manager.NetworkScenarioTest):
             for i in range(1, len(self.floating_ip_tuples)):
                 fip_tuple = self.floating_ip_tuples[i]
                 target_ip, server = fip_tuple
-                msg = "Timeout waiting for %s" % target_ip.floating_ip_address
+                msg = "Timeout waiting for %s" % target_ip['floating_ip_address']
 
                 self.assertTrue(self.
-                                ping_ip_address(target_ip.floating_ip_address,
+                                ping_ip_address(target_ip['floating_ip_address'],
                                                 should_succeed=True),
                                 msg=msg)
 
