@@ -780,7 +780,8 @@ class NetworkScenarioTest(ScenarioTest):
         # TODO(vsaienko) remove once bug: #1599836 is resolved.
         if getattr(CONF.service_available, 'ironic', False):
             p_status.append('DOWN')
-        port_map = [(p["id"], fxip["ip_address"])
+        #port_map = [(p["id"], fxip["ip_address"])
+        port_map = [(p["id"], fxip["ip_address"], p["tenant_id"])
                     for p in ports
                     for fxip in p["fixed_ips"]
                     if netutils.is_valid_ipv4(fxip["ip_address"])
@@ -812,13 +813,14 @@ class NetworkScenarioTest(ScenarioTest):
         if not client:
             client = self.floating_ips_client
         if not port_id:
-            port_id, ip4 = self._get_server_port_id_and_ip4(thing)
+            port_id, ip4, port_tenant_id = self._get_server_port_id_and_ip4(thing)
         else:
             ip4 = None
         result = client.create_floatingip(
             floating_network_id=external_network_id,
             port_id=port_id,
-            tenant_id=thing['tenant_id'],
+            #tenant_id=thing['tenant_id'],
+            tenant_id=port_tenant_id,
             fixed_ip_address=ip4
         )
         floating_ip = result['floatingip']
