@@ -16,6 +16,7 @@
 
 import datetime
 import os
+import re
 import time
 import subprocess
 import signal
@@ -47,6 +48,7 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         self.log_inspector = LogInspector()
         self.log_inspector.find_state_reports()
         self.start_time = datetime.datetime.now()
+        self.addCleanup(self.cleanup_asr_leftovers)
         self.addCleanup(self.check_log_errors)
         self.addCleanup(self.check_cfg_size)
         self.neutron_client = nc.NeutronClient(
@@ -114,6 +116,39 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         self.active_asr.record_cfg_size('test-end')
         self.standby_asr.record_cfg_size('test-end')
         self.verify_asrs.eot_cfg_sizes()
+
+    def cleanup_asr_leftovers(self):
+        # Sometimes nat pool definitions are not properly removed after a
+        # test run. This function checks for this and, if there are such
+        # leftovers, removes them. Since the cfg agent makes updates to the
+        # running config of the ASRs asyncronously to the neutron server, you
+        # should ensure this function is not called prematurely. In such cases,
+        # apparently stale nat pool definitions are not leftovers, but lines
+        # that the cfg agent is about to delete. We avoid the problem of
+        # premature invocation of this function by waiting some time before
+        # starting the cleanup.
+        time.sleep(30)
+        routers = self.routers_client.list_routers()['routers']
+        r_ids = set(router['id'][:6] for router in routers)
+        for asr_device in [self.active_asr, self.standby_asr]:
+            asr_device.send_command('')
+            size_string = asr_device.send_command("show run | inc ip nat pool")
+            lines = size_string.split('\r\n')
+            r_id_re = re.compile(
+                r'ip nat pool nrouter-([a-f0-9A-F]{6})_nat_pool')
+            remove_cmds = []
+            for line in lines:
+                r_id_match = r_id_re.match(line)
+                if r_id_match:
+                    r_id = r_id_match.group(1)
+                    if r_id not in r_ids:
+                        # must be a stale nat pool definition to clean up
+                        remove_cmds += ['no ' + line]
+            if remove_cmds:
+                asr_device.send_command('configure terminal')
+                for cmd in remove_cmds:
+                    asr_device.send_command(cmd)
+                asr_device.send_command('exit')
 
     def reboot_asr(self, asr, wait=False):
         asr.reboot(wait=wait)
@@ -406,7 +441,7 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         rtrs = self.verify_asrs.get_backup_rtr(rtr,
                                                self.routers_client,
                                                self.tenant_id)
- 
+
         # 2 Create the tenant network/subnet.
         net = self._create_network(namestart="net-de918")
         subnet = self.create_subnet(net)
