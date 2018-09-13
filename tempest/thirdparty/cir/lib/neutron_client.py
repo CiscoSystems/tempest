@@ -91,7 +91,7 @@ class NeutronClient:
             if line.startswith("+--") or line.startswith("| id "):
                 continue
             device_data = line.strip('|').split('|')
-            if len(device_data) != 5:
+            if len(device_data) != 6:
                 continue
 
             device_list[device_data[0].strip()] = {

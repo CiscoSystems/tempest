@@ -459,6 +459,9 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
 
         # 4 Note that only the sub-interface is configured at the ASRs;
         # the ACL and the inside source list NAT entry are missing.
+        old_segmentation_ids = self.segmentation_ids
+        self.segmentation_ids = []
+        self.segmentation_ids.append(net['provider:segmentation_id'])
         self.verify_asrs_de918(rtrs)
 
         # 5 Set the router gateway.
@@ -473,6 +476,7 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         # 6 The ACL and the inside source list NAT entry are still not
         # configured at the ASRs
         self.verify_asrs_de918(rtrs)
+        self.segmentation_ids = old_segmentation_ids
 
     @testtools.skipUnless(CONF.cisco.asr1,
                           'ASR1 switch not specified in tempest.conf')
