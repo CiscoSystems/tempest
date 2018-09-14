@@ -1,0 +1,132 @@
+
+[network]
+default_network = 10.0.0.0/22
+public_router_id = 
+public_network_id = <<public_network_id>> 
+project_networks_reachable = false
+api_version = 2.0
+project_network_cidr = 10.0.0.0/22
+controller_ip = <<controller ip>>
+controller_user = <<controller username>>
+controller_pw = <<controller password>>
+controller_resource_file = openrc
+controller_rc_file = /opt/os-install/devstack/openrc
+
+[DEFAULT]
+debug = True
+log_file = tempest.log
+use_stderr = False
+use_syslog = False
+
+[oslo_concurrency]
+lock_path = /opt/stack/data/tempest
+
+[compute]
+max_microversion = 2.42
+flavor_ref_alt = 84
+flavor_ref = 42
+image_ref_alt = <<alternate glance image id>>
+image_ref = <<glance image id>>
+build_timeout = 196
+
+[volume]
+max_microversion = 3.27
+build_timeout = 196
+
+[identity]
+auth_version = v3
+admin_domain_scope = True
+user_unique_last_password_count = 2
+user_lockout_duration = 5
+user_lockout_failure_attempts = 2
+uri_v3 = http://<<controller_ip>>/identity/v3
+uri = http://<<controller_ip>>:5000/v2.0/
+
+[auth]
+use_dynamic_credentials = True
+tempest_roles = admin
+admin_domain_name = Default
+admin_project_name = admin
+admin_password = password
+admin_username = admin
+
+[identity-feature-enabled]
+security_compliance = True
+api_v2 = True
+
+[validation]
+network_for_ssh = private
+image_ssh_user = cirros
+ssh_timeout = 196
+ip_version_for_ssh = 4
+run_validation = False
+connect_method = floating
+
+[compute-feature-enabled]
+swap_volume = True
+vnc_console = True
+attach_encrypted_volume = True
+live_migrate_back_and_forth = False
+block_migration_for_live_migration = False
+change_password = False
+live_migration = False
+resize = True
+personality = False
+
+[network-feature-enabled]
+api_extensions = address-scope,agent,allowed-address-pairs,auto-allocated-topology,availability_zone,binding,cisco-cfg-agent-scheduler,default-subnetpools,dev_mgr,dhcp_agent_scheduler,dns-integration,external-net,extra_dhcp_opt,extraroute,flavors,l3_agent_scheduler,multi-provider,net-mtu,network-ip-availability,network_availability_zone,pagination,port-security,project-id,provider,quotas,rbac-policies,router,router_ha,routerhost,routerrole,routertype,routertype-aware-scheduler,security-group,service-type,sorting,standard-attr-description,standard-attr-revisions,standard-attr-timestamp,subnet-service-types,subnet_allocation,tag,tag-ext
+port_security = True
+ipv6_subnet_attributes = True
+ipv6 = True
+
+[scenario]
+aki_img_file = cirros-0.3.4-x86_64-vmlinuz
+ari_img_file = cirros-0.3.4-x86_64-initrd
+ami_img_file = cirros-0.3.4-x86_64-blank.img
+img_file = cirros-0.3.4-x86_64-disk.img
+img_dir = /opt/os-install/devstack/files/images/cirros-0.3.4-x86_64-uec
+
+[volume-feature-enabled]
+api_extensions = OS-SCH-HNT,backups,capabilities,cgsnapshots,consistencygroups,encryption,os-admin-actions,os-availability-zone,os-extended-services,os-extended-snapshot-attributes,os-hosts,os-image-create,os-quota-class-sets,os-quota-sets,os-services,os-snapshot-actions,os-snapshot-manage,os-snapshot-unmanage,os-types-extra-specs,os-types-manage,os-used-limits,os-vol-host-attr,os-vol-image-meta,os-vol-mig-status-attr,os-vol-tenant-attr,os-volume-actions,os-volume-encryption-metadata,os-volume-manage,os-volume-transfer,os-volume-type-access,os-volume-unmanage,qos-specs,scheduler-stats
+backup = False
+api_v3 = True
+volume_services = True
+manage_snapshot = True
+
+[service_available]
+trove = False
+ironic = False
+sahara = False
+horizon = True
+ceilometer = False
+heat = False
+swift = False
+cinder = False
+neutron = True
+nova = True
+glance = True
+key = True
+
+[object-storage-feature-enabled]
+discoverable_apis = account_quotas,bulk_delete,bulk_upload,container_quotas,container_sync,crossdomain,formpost,ratelimit,slo,staticweb,tempauth,tempurl,versioned_writes
+
+[cisco]
+user_name = stack
+user_pw = cisco
+asr1 = <<asr1 name>>
+asr1_ip = <<asr1 ip>>
+asr2 = <<asr2 name>>
+asr2_ip = <<asr2 ip>>
+asr1_internal_intf = <<internal interface on asr1>>
+asr1_external_intf = <<external interface on asr1>>
+asr2_internal_intf = <<internal interface on asr2>>
+asr2_external_intf = <<external interface on asr2>>
+asr1_ts_ip = 
+asr1_ts_port = 
+asr1_ts_pw = 
+asr2_ts_ip = 
+asr2_ts_port = 
+asr2_ts_pw = 
+leaf1_ip =
+leaf2 =
+leaf2_ip =
