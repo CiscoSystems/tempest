@@ -355,19 +355,15 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
 
         updated_host_devices = self.neutron_client.cisco_hosting_device_list()
         i = 1
-        for host_id in updated_host_devices.keys():
+        while i < 3:
+            result = False
             expected_name = "ASR{0}".format(i)
+            for host_id in updated_host_devices.keys():
+                if expected_name == updated_host_devices[host_id]['name']:
+                    result = True
+                    break
+            self.assertIs(result, True)
             i += 1
-            self.assertEqual(expected_name,
-                             updated_host_devices[host_id]['name'])
-
-        updated_host_devices = self.neutron_client.cisco_hosting_device_list()
-        i = 1
-        for host_id in updated_host_devices.keys():
-            expected_name = "ASR{0}".format(i)
-            i += 1
-            self.assertNotEqual(expected_name,
-                             updated_host_devices[host_id]['name'])
 
         for host_id in host_devices.keys():
             host_name = host_devices[host_id]['name']
@@ -463,7 +459,6 @@ class TestASRStandBy(test_network_multi_node.TestNetworkMultiNode):
         self.segmentation_ids = []
         self.segmentation_ids.append(net['provider:segmentation_id'])
         self.verify_asrs_de918(rtrs)
-
         # 5 Set the router gateway.
         # TODO(bobmel): Clean this up
         #rtr.set_gateway(CONF.network.public_network_id)
